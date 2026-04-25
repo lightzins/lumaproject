@@ -47,10 +47,10 @@ const Navbar = () => {
     <nav 
       ref={navRef}
       className={cn(
-        "fixed top-4 md:top-8 left-1/2 -translate-x-1/2 z-[100] transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] flex items-center px-4 py-2 rounded-full border border-white/10 shadow-2xl",
+        "hidden md:flex fixed top-8 left-1/2 -translate-x-1/2 z-[100] transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] items-center px-4 py-2 rounded-full border border-white/10 shadow-2xl",
         isScrolled 
-          ? "bg-primary/90 backdrop-blur-xl w-[90%] md:w-auto" 
-          : "bg-primary/40 backdrop-blur-md w-[95%] md:w-auto"
+          ? "bg-primary/90 backdrop-blur-xl w-auto" 
+          : "bg-primary/40 backdrop-blur-md w-auto"
       )}
     >
       <div className="flex items-center gap-8 px-4 text-white">
@@ -92,10 +92,10 @@ const Hero = ({ onStart }) => {
   }, []);
 
   return (
-    <section className="h-[100svh] w-full p-0 md:p-6 bg-primary md:bg-background flex flex-col">
+    <section className="min-h-[100vh] w-full p-0 md:p-6 bg-primary md:bg-background flex flex-col">
       <div 
         ref={containerRef}
-        className="relative flex-1 w-full rounded-none md:rounded-[3rem] overflow-hidden flex flex-col justify-end p-8 md:p-20"
+        className="relative flex-1 w-full min-h-[90vh] md:min-h-0 rounded-none md:rounded-[3rem] overflow-hidden flex flex-col justify-end p-6 md:p-20"
       >
         {/* Background Image */}
         <div 
