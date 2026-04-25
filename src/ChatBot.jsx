@@ -7,7 +7,7 @@ const faqs = [
   {
     id: 'cost',
     question: 'Quanto custa em média?',
-    answer: 'Nossos projetos são sob medida, pois acreditamos em design exclusivo e alto desempenho. Landing Pages de alta conversão começam a partir de R$ 2.500. Plataformas mais complexas variam de acordo com o escopo e funcionalidades.'
+    answer: 'Nossos projetos são sob medida, pois acreditamos em design exclusivo e alto desempenho. Landing Pages de alta conversão começam a partir de R$ 100 até R$ 500. Plataformas mais complexas variam de acordo com o escopo e funcionalidades.'
   },
   {
     id: 'process',
