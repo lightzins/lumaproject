@@ -31,7 +31,7 @@ const Noise = () => (
   <div className="noise-overlay pointer-events-none fixed inset-0 z-[999] opacity-[0.03]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
 );
 
-const Navbar = ({ onStart }) => {
+const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const navRef = useRef(null);
 
@@ -53,20 +53,13 @@ const Navbar = ({ onStart }) => {
           : "bg-primary/40 backdrop-blur-md w-auto"
       )}
     >
-      <div className="flex items-center gap-12 w-full justify-between">
-        <span className="font-black text-xl tracking-tighter text-background ml-4">LUME</span>
-        <div className="hidden md:flex items-center gap-8 text-[10px] uppercase tracking-[0.25em] font-bold text-background/70">
-          <a href="#features" className="hover:text-accent transition-colors">Serviços</a>
-          <a href="#philosophy" className="hover:text-accent transition-colors">Filosofia</a>
-          <a href="#protocol" className="hover:text-accent transition-colors">Protocolo</a>
-          <a href="#pricing" className="hover:text-accent transition-colors">Investimento</a>
+      <div className="flex items-center gap-8 px-4 text-white">
+        <div className="hidden md:flex items-center gap-8 text-[10px] uppercase tracking-[0.25em] font-bold opacity-70">
+          <a href="#features" className="hover:opacity-100 transition-opacity">Serviços</a>
+          <a href="#philosophy" className="hover:opacity-100 transition-opacity">Filosofia</a>
+          <a href="#protocol" className="hover:opacity-100 transition-opacity">Protocolo</a>
+          <a href="#pricing" className="hover:opacity-100 transition-opacity">Investimento</a>
         </div>
-        <button 
-          onClick={onStart}
-          className="hidden md:flex items-center gap-2 bg-background text-primary px-4 py-2 rounded-full font-bold text-[10px] uppercase tracking-widest hover:scale-105 transition-transform"
-        >
-          Iniciar Projeto <ArrowRight className="w-3 h-3" />
-        </button>
       </div>
     </nav>
   );
@@ -112,12 +105,12 @@ const Hero = ({ onStart }) => {
         />
         <div className="absolute inset-0 z-10 bg-black/30" />
         
-        <div className="relative z-20 w-full flex flex-col md:flex-row items-start md:items-end justify-between gap-8 md:gap-12">
-          <h1 className="reveal-item text-[20vw] md:text-[18vw] font-black text-background leading-[0.8] tracking-tighter uppercase">
+        <div className="relative z-20 w-full flex flex-col md:flex-row items-end justify-between gap-8 md:gap-12">
+          <h1 className="reveal-item text-[20vw] md:text-[18vw] font-black text-background leading-[0.8] tracking-tighter uppercase w-full text-left">
             Lume<span className="text-accent">*</span>
           </h1>
           
-          <div className="max-w-sm text-left md:text-right flex flex-col items-start md:items-end mt-4 md:mt-0">
+          <div className="max-w-sm text-right flex flex-col items-end mt-4 md:mt-0">
             <p className="reveal-item text-background/80 text-sm md:text-lg mb-8 leading-relaxed font-medium">
               Lume é um estúdio global de tecnólogos criativos e contadores de histórias, unidos pela paixão de desbloquear potencial digital.
             </p>
