@@ -5,7 +5,7 @@ import emailjs from '@emailjs/browser';
 
 export const ContactModal = ({ isOpen, onClose }) => {
   const [step, setStep] = useState('signup'); // 'signup', 'details', 'loading', 'success'
-  const [accountData, setAccountData] = useState({ name: '', email: '', password: '' });
+  const [accountData, setAccountData] = useState({ name: '', email: '' });
   const [errorMessage, setErrorMessage] = useState('');
   
   const formRef = useRef(null);
@@ -19,7 +19,7 @@ export const ContactModal = ({ isOpen, onClose }) => {
       document.body.style.overflow = 'auto';
       setTimeout(() => {
         setStep('signup');
-        setAccountData({ name: '', email: '', password: '' });
+        setAccountData({ name: '', email: '' });
         setErrorMessage('');
       }, 300);
     }
@@ -32,14 +32,13 @@ export const ContactModal = ({ isOpen, onClose }) => {
     const formData = new FormData(e.target);
     const name = formData.get('name');
     const email = formData.get('email');
-    const password = formData.get('password');
 
-    // Simulate account creation delay
+    // Simulate delay
     setStep('loading');
     setErrorMessage('');
     
     setTimeout(() => {
-      setAccountData({ name, email, password });
+      setAccountData({ name, email });
       setStep('details');
     }, 1200);
   };
@@ -100,9 +99,9 @@ export const ContactModal = ({ isOpen, onClose }) => {
             <div className="w-16 h-16 bg-accent/10 rounded-3xl flex items-center justify-center mb-8">
               <UserPlus className="text-accent w-8 h-8" />
             </div>
-            <h3 className="text-3xl font-black uppercase tracking-tighter mb-4">Criar Conta</h3>
+            <h3 className="text-3xl font-black uppercase tracking-tighter mb-4">Iniciar Projeto</h3>
             <p className="text-sm opacity-50 mb-8 leading-relaxed">
-              Crie sua conta Lume para enviar propostas e acompanhar o desenvolvimento do seu projeto.
+              Preencha seus dados para enviar a proposta e dar o primeiro passo no seu projeto.
             </p>
 
             <form onSubmit={handleSignup} className="space-y-6">
@@ -128,23 +127,11 @@ export const ContactModal = ({ isOpen, onClose }) => {
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-widest opacity-60 mb-2">Senha</label>
-                <input 
-                  type="password" 
-                  name="password" 
-                  required 
-                  minLength={6}
-                  className="w-full bg-primary/5 border border-primary/10 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-accent transition-colors"
-                  placeholder="••••••••"
-                />
-              </div>
-
               <button 
                 type="submit" 
                 className="w-full py-5 rounded-full bg-black text-white font-black text-xs uppercase tracking-widest hover:bg-black/80 transition-all duration-300 flex justify-center items-center"
               >
-                Criar Conta e Continuar
+                Continuar
               </button>
             </form>
           </div>
@@ -198,7 +185,7 @@ export const ContactModal = ({ isOpen, onClose }) => {
              </div>
              <h3 className="text-3xl font-black uppercase tracking-tighter mb-4">Proposta Enviada!</h3>
              <p className="text-lg font-medium text-primary leading-relaxed mb-8">
-               Conta criada com sucesso. Retornaremos sua mensagem em até <span className="text-accent underline underline-offset-4 decoration-2">24h</span>.
+               Proposta recebida com sucesso. Retornaremos no seu e-mail em até <span className="text-accent underline underline-offset-4 decoration-2">24h</span>.
              </p>
              <button 
                onClick={onClose}
