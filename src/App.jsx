@@ -95,7 +95,7 @@ const Hero = ({ onStart }) => {
     <section className="min-h-[100svh] w-full p-0 md:p-6 bg-primary md:bg-background flex flex-col">
       <div 
         ref={containerRef}
-        className="relative flex-1 w-full min-h-[90svh] md:min-h-0 rounded-none md:rounded-[3rem] overflow-hidden flex flex-col justify-end p-6 pb-16 md:p-20"
+        className="relative flex-1 w-full min-h-[90svh] md:min-h-0 rounded-none md:rounded-[3rem] overflow-hidden flex flex-col justify-end p-6 pb-28 md:p-20"
       >
         {/* Background Image */}
         <div 
