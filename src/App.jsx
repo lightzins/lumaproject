@@ -105,22 +105,22 @@ const Hero = ({ onStart }) => {
         />
         <div className="absolute inset-0 z-10 bg-black/30" />
         
-        <div className="relative z-20 w-full flex flex-col md:flex-row items-end justify-between gap-8 md:gap-12">
-          <h1 className="reveal-item text-[20vw] md:text-[18vw] font-black text-background leading-[0.8] tracking-tighter uppercase">
+        <div className="relative z-20 w-full flex flex-col md:flex-row items-start md:items-end justify-between gap-6 md:gap-12">
+          <h1 className="reveal-item text-[22vw] md:text-[18vw] font-black text-background leading-[0.8] tracking-tighter uppercase w-full md:w-auto text-left">
             Lume<span className="text-accent">*</span>
           </h1>
           
-          <div className="max-w-sm text-right flex flex-col items-end mt-4 md:mt-0">
-            <p className="reveal-item text-background/80 text-sm md:text-lg mb-8 leading-relaxed font-medium">
+          <div className="w-full md:max-w-sm text-left md:text-right flex flex-col items-start md:items-end mt-4 md:mt-0">
+            <p className="reveal-item text-background/80 text-[15px] md:text-lg mb-8 leading-relaxed font-medium max-w-[280px] md:max-w-full">
               Lume é um estúdio global de tecnólogos criativos e contadores de histórias, unidos pela paixão de desbloquear potencial digital.
             </p>
 
             <button 
               onClick={onStart}
-              className="reveal-item bg-background text-primary px-8 md:px-10 py-4 md:py-5 rounded-full font-black text-xs uppercase tracking-widest flex items-center gap-4 btn-magnetic group hover:pr-12 transition-all duration-500"
+              className="reveal-item w-full md:w-auto bg-background text-primary px-8 md:px-10 py-5 rounded-full font-black text-xs uppercase tracking-widest flex items-center justify-between md:justify-start gap-4 btn-magnetic group hover:pr-12 transition-all duration-500"
             >
-              Iniciar Projeto
-              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center -mr-2 group-hover:mr-0 transition-all duration-500">
+              <span className="mx-auto md:mx-0">Iniciar Projeto</span>
+              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center group-hover:mr-0 transition-all duration-500 flex-shrink-0">
                 <ArrowRight className="w-4 h-4 text-background" />
               </div>
             </button>
