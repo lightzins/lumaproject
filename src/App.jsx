@@ -31,7 +31,7 @@ const Noise = () => (
   <div className="noise-overlay pointer-events-none fixed inset-0 z-[999] opacity-[0.03]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
 );
 
-const Navbar = () => {
+const Navbar = ({ onStart }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const navRef = useRef(null);
 
@@ -53,13 +53,20 @@ const Navbar = () => {
           : "bg-primary/40 backdrop-blur-md w-auto"
       )}
     >
-      <div className="flex items-center gap-8 px-4 text-white">
-        <div className="hidden md:flex items-center gap-8 text-[10px] uppercase tracking-[0.25em] font-bold opacity-70">
-          <a href="#features" className="hover:opacity-100 transition-opacity">Serviços</a>
-          <a href="#philosophy" className="hover:opacity-100 transition-opacity">Filosofia</a>
-          <a href="#protocol" className="hover:opacity-100 transition-opacity">Protocolo</a>
-          <a href="#pricing" className="hover:opacity-100 transition-opacity">Investimento</a>
+      <div className="flex items-center gap-12 w-full justify-between">
+        <span className="font-black text-xl tracking-tighter text-background ml-4">LUME</span>
+        <div className="hidden md:flex items-center gap-8 text-[10px] uppercase tracking-[0.25em] font-bold text-background/70">
+          <a href="#features" className="hover:text-accent transition-colors">Serviços</a>
+          <a href="#philosophy" className="hover:text-accent transition-colors">Filosofia</a>
+          <a href="#protocol" className="hover:text-accent transition-colors">Protocolo</a>
+          <a href="#pricing" className="hover:text-accent transition-colors">Investimento</a>
         </div>
+        <button 
+          onClick={onStart}
+          className="hidden md:flex items-center gap-2 bg-background text-primary px-4 py-2 rounded-full font-bold text-[10px] uppercase tracking-widest hover:scale-105 transition-transform"
+        >
+          Iniciar Projeto <ArrowRight className="w-3 h-3" />
+        </button>
       </div>
     </nav>
   );
@@ -92,10 +99,10 @@ const Hero = ({ onStart }) => {
   }, []);
 
   return (
-    <section className="min-h-[100vh] w-full p-0 md:p-6 bg-primary md:bg-background flex flex-col">
+    <section className="min-h-[100svh] w-full p-0 md:p-6 bg-primary md:bg-background flex flex-col">
       <div 
         ref={containerRef}
-        className="relative flex-1 w-full min-h-[90vh] md:min-h-0 rounded-none md:rounded-[3rem] overflow-hidden flex flex-col justify-end p-6 md:p-20"
+        className="relative flex-1 w-full min-h-[90svh] md:min-h-0 rounded-none md:rounded-[3rem] overflow-hidden flex flex-col justify-end p-6 pb-16 md:p-20"
       >
         {/* Background Image */}
         <div 
@@ -542,7 +549,7 @@ export default function App() {
   return (
     <main className="selection:bg-accent selection:text-primary antialiased">
       <Noise />
-      <Navbar />
+      <Navbar onStart={() => setIsModalOpen(true)} />
       <Hero onStart={() => setIsModalOpen(true)} />
       <FeatureCards />
       <Philosophy />
