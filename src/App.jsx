@@ -92,10 +92,10 @@ const Hero = ({ onStart }) => {
   }, []);
 
   return (
-    <section className="h-[100dvh] w-full p-4 md:p-6 bg-background">
+    <section className="h-[100dvh] w-full p-2 md:p-6 bg-background">
       <div 
         ref={containerRef}
-        className="relative h-full w-full rounded-[2.5rem] md:rounded-[4rem] overflow-hidden flex flex-col justify-end p-8 md:p-20"
+        className="relative h-full w-full rounded-[2.5rem] md:rounded-[4rem] overflow-hidden flex flex-col justify-end p-6 md:p-20"
       >
         {/* Background Image */}
         <div 
@@ -105,19 +105,19 @@ const Hero = ({ onStart }) => {
         />
         <div className="absolute inset-0 z-10 bg-black/30" />
         
-        <div className="relative z-20 w-full flex flex-col md:flex-row items-end justify-between gap-12">
-          <h1 className="reveal-item text-[12vw] md:text-[18vw] font-black text-background leading-[0.8] tracking-tighter uppercase">
+        <div className="relative z-20 w-full flex flex-col md:flex-row items-start md:items-end justify-between gap-8 md:gap-12">
+          <h1 className="reveal-item text-[20vw] md:text-[18vw] font-black text-background leading-[0.8] tracking-tighter uppercase">
             Lume<span className="text-accent">*</span>
           </h1>
           
-          <div className="max-w-sm text-right flex flex-col items-end">
+          <div className="max-w-sm text-left md:text-right flex flex-col items-start md:items-end mt-4 md:mt-0">
             <p className="reveal-item text-background/80 text-sm md:text-lg mb-8 leading-relaxed font-medium">
               Lume é um estúdio global de tecnólogos criativos e contadores de histórias, unidos pela paixão de desbloquear potencial digital.
             </p>
 
             <button 
               onClick={onStart}
-              className="reveal-item bg-background text-primary px-10 py-5 rounded-full font-black text-xs uppercase tracking-widest flex items-center gap-4 btn-magnetic group hover:pr-12 transition-all duration-500"
+              className="reveal-item bg-background text-primary px-8 md:px-10 py-4 md:py-5 rounded-full font-black text-xs uppercase tracking-widest flex items-center gap-4 btn-magnetic group hover:pr-12 transition-all duration-500"
             >
               Iniciar Projeto
               <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center -mr-2 group-hover:mr-0 transition-all duration-500">
@@ -168,11 +168,11 @@ const FeatureCards = () => {
   }, []);
 
   return (
-    <section id="features" className="py-48 px-8 md:px-24 bg-background">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-7xl mx-auto">
+    <section id="features" className="py-24 md:py-48 px-6 md:px-24 bg-background">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 max-w-7xl mx-auto">
         
         {/* Card 1: Diagnostic Shuffler */}
-        <div className="bg-white/40 backdrop-blur-sm border border-primary/5 rounded-[2.5rem] p-10 min-h-[500px] flex flex-col shadow-[0_4px_20px_rgba(0,0,0,0.02)] group hover:shadow-[0_30px_60px_rgba(0,0,0,0.06)] transition-all duration-700">
+        <div className="bg-white/40 backdrop-blur-sm border border-primary/5 rounded-[2.5rem] p-8 md:p-10 min-h-[400px] md:min-h-[500px] flex flex-col shadow-[0_4px_20px_rgba(0,0,0,0.02)] group hover:shadow-[0_30px_60px_rgba(0,0,0,0.06)] transition-all duration-700">
           <div className="flex items-center gap-4 mb-12">
             <Layers className="text-accent w-6 h-6" />
             <h3 className="font-bold text-xl uppercase tracking-tighter">Do seu jeito</h3>
@@ -199,7 +199,7 @@ const FeatureCards = () => {
         </div>
 
         {/* Card 2: Telemetry Typewriter */}
-        <div className="bg-white/40 backdrop-blur-sm border border-primary/5 rounded-[2.5rem] p-10 min-h-[500px] flex flex-col shadow-[0_4px_20px_rgba(0,0,0,0.02)] group hover:shadow-[0_30px_60px_rgba(0,0,0,0.06)] transition-all duration-700">
+        <div className="bg-white/40 backdrop-blur-sm border border-primary/5 rounded-[2.5rem] p-8 md:p-10 min-h-[400px] md:min-h-[500px] flex flex-col shadow-[0_4px_20px_rgba(0,0,0,0.02)] group hover:shadow-[0_30px_60px_rgba(0,0,0,0.06)] transition-all duration-700">
           <div className="flex items-center gap-4 mb-12">
             <Terminal className="text-accent w-6 h-6" />
             <h3 className="font-bold text-xl uppercase tracking-tighter">Design Editorial</h3>
@@ -220,7 +220,7 @@ const FeatureCards = () => {
         </div>
 
         {/* Card 3: Cursor Protocol Scheduler */}
-        <div className="bg-white/40 backdrop-blur-sm border border-primary/5 rounded-[2.5rem] p-10 min-h-[500px] flex flex-col shadow-[0_4px_20px_rgba(0,0,0,0.02)] group hover:shadow-[0_30px_60px_rgba(0,0,0,0.06)] transition-all duration-700">
+        <div className="bg-white/40 backdrop-blur-sm border border-primary/5 rounded-[2.5rem] p-8 md:p-10 min-h-[400px] md:min-h-[500px] flex flex-col shadow-[0_4px_20px_rgba(0,0,0,0.02)] group hover:shadow-[0_30px_60px_rgba(0,0,0,0.06)] transition-all duration-700">
           <div className="flex items-center gap-4 mb-12">
             <Calendar className="text-accent w-6 h-6" />
             <h3 className="font-bold text-xl uppercase tracking-tighter">Performance</h3>
@@ -285,7 +285,7 @@ const Philosophy = () => {
     <section 
       id="philosophy"
       ref={sectionRef}
-      className="relative py-32 bg-primary text-background overflow-hidden px-8 md:px-24"
+      className="relative py-24 md:py-32 bg-primary text-background overflow-hidden px-6 md:px-24"
     >
       <div 
         ref={bgRef}
@@ -294,17 +294,17 @@ const Philosophy = () => {
       />
       
       <div className="relative z-10 max-w-5xl">
-        <p className="reveal-p text-sm uppercase tracking-[0.3em] opacity-40 mb-12">O Manifesto Lume</p>
+        <p className="reveal-p text-xs md:text-sm uppercase tracking-[0.3em] opacity-40 mb-8 md:mb-12">O Manifesto Lume</p>
         
-        <div className="space-y-16">
+        <div className="space-y-12 md:space-y-16">
           <div className="reveal-p">
-            <span className="text-lg opacity-40 block mb-4">A maioria das agências foca em:</span>
-            <h2 className="text-3xl md:text-5xl font-bold opacity-60">Templates genéricos e prazos curtos.</h2>
+            <span className="text-sm md:text-lg opacity-40 block mb-4">A maioria das agências foca em:</span>
+            <h2 className="text-2xl md:text-5xl font-bold opacity-60">Templates genéricos e prazos curtos.</h2>
           </div>
 
           <div className="reveal-p">
-            <span className="text-lg opacity-40 block mb-4">Nós focamos em:</span>
-            <h2 className="text-5xl md:text-[7rem] text-drama leading-none">
+            <span className="text-sm md:text-lg opacity-40 block mb-4">Nós focamos em:</span>
+            <h2 className="text-4xl md:text-[7rem] text-drama leading-none mt-2">
               Arquitetura <span className="text-accent">Intencional.</span>
             </h2>
           </div>
@@ -356,12 +356,12 @@ const Protocol = () => {
   ];
 
   return (
-    <section id="protocol" ref={containerRef} className="bg-background py-48 px-8 md:px-24 border-t border-primary/5">
+    <section id="protocol" ref={containerRef} className="bg-background py-24 md:py-48 px-6 md:px-24 border-t border-primary/5">
       <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-32">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8 mb-16 md:mb-32">
           <div className="max-w-2xl">
-            <span className="font-mono text-accent text-xs uppercase tracking-[0.3em] mb-6 block">Nosso Processo</span>
-            <h2 className="text-5xl md:text-7xl font-black tracking-tighter uppercase leading-[0.9]">
+            <span className="font-mono text-accent text-[10px] md:text-xs uppercase tracking-[0.3em] mb-4 md:mb-6 block">Nosso Processo</span>
+            <h2 className="text-4xl md:text-7xl font-black tracking-tighter uppercase leading-[0.9]">
               Protocolo de<br/>Execução
             </h2>
           </div>
@@ -394,14 +394,14 @@ const Protocol = () => {
 
 const Pricing = ({ onStart }) => {
   return (
-    <section id="pricing" className="relative py-48 px-8 md:px-24 bg-background z-[20] shadow-[0_-20px_50px_rgba(0,0,0,0.05)]">
-      <div className="text-center mb-24 relative z-10">
-        <h2 className="text-4xl md:text-6xl font-bold mb-6">Investimento</h2>
-        <p className="opacity-60 max-w-lg mx-auto">Soluções sob medida para diferentes estágios de crescimento.</p>
+    <section id="pricing" className="relative py-24 md:py-48 px-6 md:px-24 bg-background z-[20] shadow-[0_-20px_50px_rgba(0,0,0,0.05)]">
+      <div className="text-center mb-16 md:mb-24 relative z-10">
+        <h2 className="text-3xl md:text-6xl font-bold mb-4 md:mb-6">Investimento</h2>
+        <p className="opacity-60 max-w-lg mx-auto text-sm md:text-base">Soluções sob medida para diferentes estágios de crescimento.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
-        <div className="bg-white/50 backdrop-blur-md p-10 rounded-[3rem] border border-primary/5 flex flex-col shadow-sm">
+        <div className="bg-white/50 backdrop-blur-md p-8 md:p-10 rounded-[3rem] border border-primary/5 flex flex-col shadow-sm">
           <span className="text-[10px] font-mono opacity-30 mb-4 uppercase tracking-widest">Essencial</span>
           <h3 className="text-4xl font-bold mb-8 tracking-tighter">One-Page</h3>
           <ul className="space-y-4 mb-12 flex-1">
@@ -419,7 +419,7 @@ const Pricing = ({ onStart }) => {
           </button>
         </div>
 
-        <div className="bg-primary text-background p-10 rounded-[3rem] border border-accent/20 flex flex-col scale-105 shadow-[0_20px_80px_rgba(0,0,0,0.3)] relative overflow-hidden">
+        <div className="bg-primary text-background p-8 md:p-10 rounded-[3rem] border border-accent/20 flex flex-col md:scale-105 shadow-[0_20px_80px_rgba(0,0,0,0.3)] relative overflow-hidden">
           <div className="absolute top-6 right-8 bg-accent text-primary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">Popular</div>
           <span className="text-sm font-mono opacity-40 mb-4 uppercase">Performance</span>
           <h3 className="text-4xl font-bold mb-8">Multi-Page</h3>
@@ -432,13 +432,13 @@ const Pricing = ({ onStart }) => {
           </ul>
           <button 
             onClick={onStart}
-            className="w-full py-4 rounded-full bg-accent text-primary font-bold btn-magnetic"
+            className="w-full py-4 rounded-full bg-accent text-primary font-bold btn-magnetic hover:scale-[1.02] transition-transform"
           >
             Iniciar Projeto
           </button>
         </div>
 
-        <div className="bg-white/50 backdrop-blur-md p-10 rounded-[3rem] border border-primary/5 flex flex-col shadow-sm">
+        <div className="bg-white/50 backdrop-blur-md p-8 md:p-10 rounded-[3rem] border border-primary/5 flex flex-col shadow-sm">
           <span className="text-[10px] font-mono opacity-30 mb-4 uppercase tracking-widest">Enterprise</span>
           <h3 className="text-4xl font-bold mb-8 tracking-tighter">Customizado</h3>
           <ul className="space-y-4 mb-12 flex-1">
@@ -462,8 +462,8 @@ const Pricing = ({ onStart }) => {
 
 const Footer = () => {
   return (
-    <footer className="bg-primary text-background rounded-t-[4rem] px-8 md:px-24 pt-32 pb-12">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-16 mb-24">
+    <footer className="bg-primary text-background rounded-t-[3rem] md:rounded-t-[4rem] px-6 md:px-24 pt-20 md:pt-32 pb-12">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-16 mb-16 md:mb-24">
         <div className="col-span-1 md:col-span-2">
           <h2 className="text-4xl font-bold uppercase tracking-tighter mb-8">Lume</h2>
           <p className="opacity-40 max-w-xs leading-relaxed">
