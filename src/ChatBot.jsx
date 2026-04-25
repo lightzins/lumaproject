@@ -24,7 +24,7 @@ const faqs = [
     id: 'contact',
     question: 'Falar com um humano',
     answer: 'Nossa equipe está pronta para entender sua visão em detalhes. Clique abaixo para ir direto ao nosso WhatsApp.',
-    action: { label: 'Abrir WhatsApp', url: 'https://wa.me/5511999999999?text=Olá%2C%20vim%20pelo%20site%20Lume%20e%20gostaria%20de%20conversar%20sobre%20um%20projeto.' }
+    action: { label: 'Abrir WhatsApp', url: 'https://wa.me/5521981436672?text=Olá%2C%20vim%20pelo%20site%20Lume%20e%20gostaria%20de%20conversar%20sobre%20um%20projeto.' }
   }
 ];
 
