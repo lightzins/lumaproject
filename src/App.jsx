@@ -106,7 +106,7 @@ const Hero = ({ onStart }) => {
         <div className="absolute inset-0 z-10 bg-black/30" />
         
         <div className="relative z-20 w-full flex flex-col md:flex-row items-end justify-between gap-8 md:gap-12">
-          <h1 className="reveal-item text-[20vw] md:text-[18vw] font-black text-background leading-[0.8] tracking-tighter uppercase w-full text-left">
+          <h1 className="reveal-item text-[20vw] md:text-[18vw] font-black text-background leading-[0.8] tracking-tighter uppercase">
             Lume<span className="text-accent">*</span>
           </h1>
           
