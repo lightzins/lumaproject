@@ -10,7 +10,7 @@
 }
 
 body {
-  background-color: var(--background);
+  background-color: var(--primary);
   color: var(--primary);
   overflow-x: hidden;
 }
