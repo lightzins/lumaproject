@@ -47,7 +47,7 @@ const Navbar = () => {
     <nav 
       ref={navRef}
       className={cn(
-        "fixed top-8 left-1/2 -translate-x-1/2 z-[100] transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] flex items-center px-4 py-2 rounded-full border border-white/10 shadow-2xl",
+        "fixed top-4 md:top-8 left-1/2 -translate-x-1/2 z-[100] transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] flex items-center px-4 py-2 rounded-full border border-white/10 shadow-2xl",
         isScrolled 
           ? "bg-primary/90 backdrop-blur-xl w-[90%] md:w-auto" 
           : "bg-primary/40 backdrop-blur-md w-[95%] md:w-auto"
@@ -92,10 +92,10 @@ const Hero = ({ onStart }) => {
   }, []);
 
   return (
-    <section className="h-[100dvh] w-full md:p-6 bg-background">
+    <section className="min-h-[100svh] w-full p-0 md:p-6 bg-background">
       <div 
         ref={containerRef}
-        className="relative h-full w-full rounded-b-[2.5rem] md:rounded-[4rem] overflow-hidden flex flex-col justify-end p-6 md:p-20"
+        className="relative min-h-[100svh] md:min-h-full w-full rounded-none md:rounded-[4rem] overflow-hidden flex flex-col justify-end p-6 md:p-20 pt-24"
       >
         {/* Background Image */}
         <div 
@@ -169,10 +169,10 @@ const FeatureCards = () => {
 
   return (
     <section id="features" className="py-24 md:py-48 px-6 md:px-24 bg-background">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 max-w-7xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 max-w-7xl mx-auto overflow-hidden">
         
         {/* Card 1: Diagnostic Shuffler */}
-        <div className="bg-white/40 backdrop-blur-sm border border-primary/5 rounded-[2.5rem] p-8 md:p-10 min-h-[400px] md:min-h-[500px] flex flex-col shadow-[0_4px_20px_rgba(0,0,0,0.02)] group hover:shadow-[0_30px_60px_rgba(0,0,0,0.06)] transition-all duration-700">
+        <div className="bg-white/40 backdrop-blur-sm border border-primary/5 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 min-h-[320px] md:min-h-[500px] flex flex-col shadow-[0_4px_20px_rgba(0,0,0,0.02)] group hover:shadow-[0_30px_60px_rgba(0,0,0,0.06)] transition-all duration-700">
           <div className="flex items-center gap-4 mb-12">
             <Layers className="text-accent w-6 h-6" />
             <h3 className="font-bold text-xl uppercase tracking-tighter">Do seu jeito</h3>
@@ -199,7 +199,7 @@ const FeatureCards = () => {
         </div>
 
         {/* Card 2: Telemetry Typewriter */}
-        <div className="bg-white/40 backdrop-blur-sm border border-primary/5 rounded-[2.5rem] p-8 md:p-10 min-h-[400px] md:min-h-[500px] flex flex-col shadow-[0_4px_20px_rgba(0,0,0,0.02)] group hover:shadow-[0_30px_60px_rgba(0,0,0,0.06)] transition-all duration-700">
+        <div className="bg-white/40 backdrop-blur-sm border border-primary/5 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 min-h-[320px] md:min-h-[500px] flex flex-col shadow-[0_4px_20px_rgba(0,0,0,0.02)] group hover:shadow-[0_30px_60px_rgba(0,0,0,0.06)] transition-all duration-700">
           <div className="flex items-center gap-4 mb-12">
             <Terminal className="text-accent w-6 h-6" />
             <h3 className="font-bold text-xl uppercase tracking-tighter">Design Editorial</h3>
@@ -220,7 +220,7 @@ const FeatureCards = () => {
         </div>
 
         {/* Card 3: Cursor Protocol Scheduler */}
-        <div className="bg-white/40 backdrop-blur-sm border border-primary/5 rounded-[2.5rem] p-8 md:p-10 min-h-[400px] md:min-h-[500px] flex flex-col shadow-[0_4px_20px_rgba(0,0,0,0.02)] group hover:shadow-[0_30px_60px_rgba(0,0,0,0.06)] transition-all duration-700">
+        <div className="bg-white/40 backdrop-blur-sm border border-primary/5 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 min-h-[320px] md:min-h-[500px] flex flex-col shadow-[0_4px_20px_rgba(0,0,0,0.02)] group hover:shadow-[0_30px_60px_rgba(0,0,0,0.06)] transition-all duration-700">
           <div className="flex items-center gap-4 mb-12">
             <Calendar className="text-accent w-6 h-6" />
             <h3 className="font-bold text-xl uppercase tracking-tighter">Performance</h3>
@@ -299,13 +299,13 @@ const Philosophy = () => {
         <div className="space-y-12 md:space-y-16">
           <div className="reveal-p">
             <span className="text-sm md:text-lg opacity-40 block mb-4">A maioria das agências foca em:</span>
-            <h2 className="text-2xl md:text-5xl font-bold opacity-60">Templates genéricos e prazos curtos.</h2>
+            <h2 className="text-3xl md:text-5xl font-bold opacity-60">Templates genéricos e prazos curtos.</h2>
           </div>
 
           <div className="reveal-p">
             <span className="text-sm md:text-lg opacity-40 block mb-4">Nós focamos em:</span>
-            <h2 className="text-4xl md:text-[7rem] text-drama leading-none mt-2">
-              Arquitetura <span className="text-accent">Intencional.</span>
+            <h2 className="text-[12vw] md:text-[7rem] text-drama leading-none mt-2">
+              Arquitetura<br className="md:hidden" /> <span className="text-accent">Intencional.</span>
             </h2>
           </div>
         </div>
@@ -394,14 +394,14 @@ const Protocol = () => {
 
 const Pricing = ({ onStart }) => {
   return (
-    <section id="pricing" className="relative py-24 md:py-48 px-6 md:px-24 bg-background z-[20] shadow-[0_-20px_50px_rgba(0,0,0,0.05)]">
+    <section id="pricing" className="relative py-24 md:py-48 px-6 md:px-24 bg-background z-[20] shadow-[0_-20px_50px_rgba(0,0,0,0.05)] overflow-hidden">
       <div className="text-center mb-16 md:mb-24 relative z-10">
         <h2 className="text-3xl md:text-6xl font-bold mb-4 md:mb-6">Investimento</h2>
         <p className="opacity-60 max-w-lg mx-auto text-sm md:text-base">Soluções sob medida para diferentes estágios de crescimento.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
-        <div className="bg-white/50 backdrop-blur-md p-8 md:p-10 rounded-[3rem] border border-primary/5 flex flex-col shadow-sm">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto px-2 md:px-0">
+        <div className="bg-white/50 backdrop-blur-md p-8 md:p-10 rounded-[2rem] md:rounded-[3rem] border border-primary/5 flex flex-col shadow-sm">
           <span className="text-[10px] font-mono opacity-30 mb-4 uppercase tracking-widest">Essencial</span>
           <h3 className="text-4xl font-bold mb-8 tracking-tighter">One-Page</h3>
           <ul className="space-y-4 mb-12 flex-1">
@@ -419,14 +419,14 @@ const Pricing = ({ onStart }) => {
           </button>
         </div>
 
-        <div className="bg-primary text-background p-8 md:p-10 rounded-[3rem] border border-accent/20 flex flex-col md:scale-105 shadow-[0_20px_80px_rgba(0,0,0,0.3)] relative overflow-hidden">
+        <div className="bg-primary text-background p-8 md:p-10 rounded-[2rem] md:rounded-[3rem] border border-accent/20 flex flex-col md:scale-105 shadow-[0_20px_80px_rgba(0,0,0,0.3)] relative overflow-hidden">
           <div className="absolute top-6 right-8 bg-accent text-primary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">Popular</div>
           <span className="text-sm font-mono opacity-40 mb-4 uppercase">Performance</span>
-          <h3 className="text-4xl font-bold mb-8">Multi-Page</h3>
+          <h3 className="text-3xl md:text-4xl font-bold mb-8">Multi-Page</h3>
           <ul className="space-y-4 mb-12 flex-1">
             {['Micro-Interações Avançadas', 'Copywriting Estratégico', 'Integração CMS', 'Performance 100%'].map(item => (
               <li key={item} className="flex items-center gap-3 opacity-80 text-sm">
-                <CheckCircle2 className="w-4 h-4 text-accent" /> {item}
+                <CheckCircle2 className="w-4 h-4 text-accent flex-shrink-0" /> <span className="leading-tight">{item}</span>
               </li>
             ))}
           </ul>
@@ -438,7 +438,7 @@ const Pricing = ({ onStart }) => {
           </button>
         </div>
 
-        <div className="bg-white/50 backdrop-blur-md p-8 md:p-10 rounded-[3rem] border border-primary/5 flex flex-col shadow-sm">
+        <div className="bg-white/50 backdrop-blur-md p-8 md:p-10 rounded-[2rem] md:rounded-[3rem] border border-primary/5 flex flex-col shadow-sm">
           <span className="text-[10px] font-mono opacity-30 mb-4 uppercase tracking-widest">Enterprise</span>
           <h3 className="text-4xl font-bold mb-8 tracking-tighter">Customizado</h3>
           <ul className="space-y-4 mb-12 flex-1">
