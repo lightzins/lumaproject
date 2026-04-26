@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from './supabase';
 import { useNavigate } from 'react-router-dom';
-import { Users, LogOut, Send, Search, MessageSquare, Bot, ArrowLeft, Sparkles, Trash2, CheckCircle } from 'lucide-react';
+import { Users, LogOut, Send, Search, MessageSquare, Bot, ArrowLeft, Sparkles, Trash2, CheckCircle, AlertCircle, X } from 'lucide-react';
+import { ConfirmModal } from './ConfirmModal';
 
 export const AdminPanel = () => {
   const [activeTab, setActiveTab] = useState('chats'); // 'chats' | 'leads'
@@ -13,6 +14,7 @@ export const AdminPanel = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, title: '', message: '', onConfirm: () => {} });
   
   const messagesEndRef = useRef(null);
   const navigate = useNavigate();
@@ -120,10 +122,16 @@ export const AdminPanel = () => {
   };
 
   const handleRemoveLead = async (id) => {
-    if (!confirm('Deseja remover este orçamento?')) return;
-    await supabase.from('leads').delete().eq('id', id);
-    setSelectedItem(null);
-    fetchLeads();
+    setConfirmConfig({
+      isOpen: true,
+      title: "Remover Orçamento",
+      message: "Tem certeza que deseja excluir permanentemente este orçamento? Esta ação não pode ser desfeita.",
+      onConfirm: async () => {
+        await supabase.from('leads').delete().eq('id', id);
+        setSelectedItem(null);
+        fetchLeads();
+      }
+    });
   };
 
   const handleLogout = async () => {
@@ -262,12 +270,17 @@ export const AdminPanel = () => {
               <div className="flex items-center gap-2 flex-shrink-0">
                 {activeTab === 'chats' ? (
                   <button 
-                    onClick={async () => { 
-                      if(confirm('Encerrar esta conversa? Ela será arquivada.')) {
-                        const { error } = await supabase.from('profiles').update({ status: 'archived' }).eq('id', selectedItem.id);
-                        if (error) alert(error.message);
-                        else { setSelectedItem(null); fetchClients(); }
-                      } 
+                    onClick={() => { 
+                      setConfirmConfig({
+                        isOpen: true,
+                        title: "Encerrar Conversa",
+                        message: "Deseja encerrar este atendimento? A conversa será arquivada e removida da sua lista ativa.",
+                        onConfirm: async () => {
+                          const { error } = await supabase.from('profiles').update({ status: 'archived' }).eq('id', selectedItem.id);
+                          if (error) alert(error.message);
+                          else { setSelectedItem(null); fetchClients(); }
+                        }
+                      });
                     }}
                     className="flex items-center gap-2 px-3 md:px-4 py-2 bg-white/5 hover:bg-red-500/10 hover:text-red-400 border border-white/10 rounded-xl text-[9px] md:text-[10px] font-bold uppercase tracking-widest transition-all"
                   >
@@ -388,6 +401,10 @@ export const AdminPanel = () => {
           </>
         )}
       </main>
+      <ConfirmModal 
+        {...confirmConfig} 
+        onClose={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))} 
+      />
     </div>
   );
 };

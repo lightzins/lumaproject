@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from './supabase';
 import { useNavigate } from 'react-router-dom';
-import { Send, LogOut, ArrowLeft, Bot, User as UserIcon } from 'lucide-react';
+import { Send, LogOut, ArrowLeft, Bot, User as UserIcon, AlertCircle } from 'lucide-react';
+import { ConfirmModal } from './ConfirmModal';
 
 export const ClientChat = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, title: '', message: '', onConfirm: () => {} });
   const messagesEndRef = useRef(null);
   const navigate = useNavigate();
 
@@ -116,7 +118,14 @@ export const ClientChat = () => {
         </div>
         <div className="flex items-center gap-2">
           <button 
-            onClick={() => { if(confirm('Deseja encerrar este atendimento?')) navigate('/'); }}
+            onClick={() => { 
+              setConfirmConfig({
+                isOpen: true,
+                title: "Encerrar Atendimento",
+                message: "Deseja finalizar o seu atendimento agora? Você poderá voltar a qualquer momento.",
+                onConfirm: () => navigate('/')
+              });
+            }}
             className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-red-500/10 hover:text-red-400 border border-white/10 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all mr-2"
           >
             Encerrar Atendimento
@@ -177,6 +186,12 @@ export const ClientChat = () => {
           </button>
         </form>
       </footer>
+      <ConfirmModal 
+        {...confirmConfig} 
+        onClose={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))} 
+        variant="info"
+        confirmText="Finalizar"
+      />
     </div>
   );
 };
