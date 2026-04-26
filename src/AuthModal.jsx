@@ -96,9 +96,9 @@ export const AuthModal = ({ isOpen, onClose }) => {
 
         <button 
           onClick={handleClose}
-          className="absolute top-6 right-6 p-2 rounded-full hover:bg-white/10 transition-colors z-10"
+          className="absolute top-2 right-2 md:top-4 md:right-4 p-4 md:p-3 rounded-full hover:bg-white/10 transition-colors z-50"
         >
-          <X className="w-5 h-5 text-white/60 hover:text-white" />
+          <X className="w-6 h-6 md:w-5 md:h-5 text-white/60 hover:text-white" />
         </button>
 
         <div className="relative z-10">
