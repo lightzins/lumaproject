@@ -140,6 +140,16 @@ export const ContactModal = ({ isOpen, onClose }) => {
                 </div>
 
                 <div>
+                  <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2 ml-1">Quanto pretende investir? (Opcional)</label>
+                  <input 
+                    type="text" value={formData.budget}
+                    onChange={e => setFormData({...formData, budget: e.target.value})}
+                    placeholder="Ex: R$ 500 - R$ 2.000"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white placeholder:text-white/20 focus:outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/50 transition-all"
+                  />
+                </div>
+
+                <div>
                   <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2 ml-1">Interesse</label>
                   <div className="flex flex-wrap gap-2">
                     {servicesList.map(service => (

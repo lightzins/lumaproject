@@ -290,7 +290,7 @@ export const AdminPanel = () => {
                       <h3 className="text-sm md:text-xl font-bold uppercase tracking-widest">Resumo do Projeto</h3>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
                       <div>
                         <p className="text-[9px] md:text-[10px] uppercase tracking-widest text-white/30 mb-1 md:mb-2">Cliente</p>
                         <p className="font-bold text-sm md:text-base">{selectedItem.name}</p>
@@ -298,6 +298,10 @@ export const AdminPanel = () => {
                       <div>
                         <p className="text-[9px] md:text-[10px] uppercase tracking-widest text-white/30 mb-1 md:mb-2">Email</p>
                         <p className="font-mono text-[10px] md:text-sm break-all">{selectedItem.email}</p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] md:text-[10px] uppercase tracking-widest text-white/30 mb-1 md:mb-2">Investimento</p>
+                        <p className="font-bold text-sm md:text-base text-accent">{selectedItem.budget || 'Não informado'}</p>
                       </div>
                     </div>
 
