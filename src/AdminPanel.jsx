@@ -76,6 +76,7 @@ export const AdminPanel = () => {
       .from('profiles')
       .select('*')
       .eq('role', 'client')
+      .neq('status', 'archived')
       .order('created_at', { ascending: false });
     if (data) setClients(data);
   };
