@@ -22,8 +22,8 @@ const faqs = [
   {
     id: 'contact',
     question: 'Falar com um humano',
-    answer: 'Nossa equipe está pronta para entender sua visão em detalhes. Clique abaixo para ir direto ao nosso WhatsApp.',
-    action: { label: 'Abrir WhatsApp', url: 'https://wa.me/5521981436672?text=Ol%C3%A1%2C%20vim%20pelo%20site%20Lume%20e%20gostaria%20de%20conversar%20sobre%20um%20projeto.' }
+    answer: 'Nossa equipe está pronta para entender sua visão em detalhes. Clique abaixo para iniciar seu atendimento no nosso chat oficial.',
+    action: { label: 'Iniciar Chat', type: 'chat' }
   }
 ];
 
@@ -117,6 +117,21 @@ export const ChatBot = ({ onStart, isOpen: controlledIsOpen, onClose: controlled
     setIsTyping(true);
 
     setTimeout(() => {
+      // Check if it's a direct chat action
+      if (faq.action?.type === 'chat') {
+        setMessages(prev => [...prev, {
+          id: Date.now() + 1,
+          text: 'Redirecionando você para o nosso chat... Um momento.',
+          sender: 'bot'
+        }]);
+        setIsTyping(false);
+        setTimeout(() => {
+          handleClose();
+          onStart && onStart();
+        }, 1500);
+        return;
+      }
+
       setMessages(prev => [...prev, {
         id: Date.now() + 1,
         text: faq.answer,
