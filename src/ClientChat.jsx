@@ -114,9 +114,17 @@ export const ClientChat = () => {
             </div>
           </div>
         </div>
-        <button onClick={handleLogout} className="text-white/40 hover:text-red-400 transition-colors" title="Sair">
-          <LogOut className="w-5 h-5" />
-        </button>
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={() => { if(confirm('Deseja encerrar este atendimento?')) navigate('/'); }}
+            className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-red-500/10 hover:text-red-400 border border-white/10 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all mr-2"
+          >
+            Encerrar Atendimento
+          </button>
+          <button onClick={handleLogout} className="text-white/40 hover:text-red-400 transition-colors" title="Sair">
+            <LogOut className="w-5 h-5" />
+          </button>
+        </div>
       </header>
 
       {/* Messages */}

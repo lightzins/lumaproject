@@ -279,25 +279,25 @@ export const AdminPanel = () => {
               </div>
             </header>
 
-            <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
+            <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-8 custom-scrollbar">
               {activeTab === 'leads' ? (
-                <div className="max-w-2xl mx-auto">
-                  <div className="bg-white/5 border border-white/10 rounded-[2.5rem] p-10 space-y-8 relative overflow-hidden">
+                <div className="max-w-2xl mx-auto w-full">
+                  <div className="bg-white/5 border border-white/10 rounded-3xl md:rounded-[2.5rem] p-6 md:p-10 space-y-6 md:space-y-8 relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-accent/10 blur-[50px] -mr-16 -mt-16" />
                     
                     <div className="flex items-center gap-4 text-accent">
-                      <Sparkles className="w-6 h-6" />
-                      <h3 className="text-xl font-bold uppercase tracking-widest">Resumo do Projeto</h3>
+                      <Sparkles className="w-5 h-5 md:w-6 md:h-6" />
+                      <h3 className="text-lg md:text-xl font-bold uppercase tracking-widest">Resumo do Projeto</h3>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                       <div>
                         <p className="text-[10px] uppercase tracking-widest text-white/30 mb-2">Cliente</p>
-                        <p className="font-bold">{selectedItem.name}</p>
+                        <p className="font-bold text-sm md:text-base">{selectedItem.name}</p>
                       </div>
                       <div>
                         <p className="text-[10px] uppercase tracking-widest text-white/30 mb-2">Email</p>
-                        <p className="font-mono text-sm">{selectedItem.email}</p>
+                        <p className="font-mono text-xs md:text-sm break-all">{selectedItem.email}</p>
                       </div>
                     </div>
 
@@ -305,18 +305,18 @@ export const AdminPanel = () => {
                       <p className="text-[10px] uppercase tracking-widest text-white/30 mb-4">Serviços Solicitados</p>
                       <div className="flex flex-wrap gap-2">
                         {selectedItem.services?.map(s => (
-                          <span key={s} className="px-4 py-1.5 bg-accent/20 text-accent rounded-full text-[10px] font-bold uppercase tracking-widest border border-accent/20">{s}</span>
+                          <span key={s} className="px-3 md:px-4 py-1.5 bg-accent/20 text-accent rounded-full text-[9px] md:text-[10px] font-bold uppercase tracking-widest border border-accent/20">{s}</span>
                         ))}
                       </div>
                     </div>
 
-                    <div className="p-6 bg-black/20 rounded-2xl border border-white/5">
+                    <div className="p-5 md:p-6 bg-black/20 rounded-2xl border border-white/5">
                       <p className="text-[10px] uppercase tracking-widest text-white/30 mb-4">A Ideia</p>
-                      <p className="text-sm leading-relaxed text-white/80">{selectedItem.idea}</p>
+                      <p className="text-xs md:text-sm leading-relaxed text-white/80">{selectedItem.idea}</p>
                     </div>
 
                     <div className="pt-6 border-t border-white/5">
-                      <p className="text-[10px] text-white/20 font-mono">RECEBIDO_EM: {new Date(selectedItem.created_at).toLocaleString()}</p>
+                      <p className="text-[9px] md:text-[10px] text-white/20 font-mono">RECEBIDO_EM: {new Date(selectedItem.created_at).toLocaleString()}</p>
                     </div>
                   </div>
                 </div>
