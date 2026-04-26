@@ -27,8 +27,20 @@ const faqs = [
   }
 ];
 
-export const ChatBot = ({ onStart }) => {
-  const [isOpen, setIsOpen] = useState(false);
+export const ChatBot = ({ onStart, isOpen: controlledIsOpen, onClose: controlledOnClose }) => {
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
+  
+  const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
+  
+  const handleClose = () => {
+    if (controlledOnClose) controlledOnClose();
+    else setInternalIsOpen(false);
+  };
+  
+  const handleOpen = () => {
+    setInternalIsOpen(true);
+  };
+
   const [messages, setMessages] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
@@ -46,7 +58,7 @@ export const ChatBot = ({ onStart }) => {
 
   // GSAP open/close — no CSS conflict
   useEffect(() => {
-    if (!chatRef.current || !btnRef.current) return;
+    if (!chatRef.current) return;
 
     if (isOpen) {
       gsap.to(chatRef.current, {
@@ -54,11 +66,13 @@ export const ChatBot = ({ onStart }) => {
         ease: 'back.out(1.4)',
         pointerEvents: 'auto',
       });
-      gsap.to(btnRef.current, {
-        opacity: 0, scale: 0, duration: 0.2,
-        ease: 'power2.in',
-        pointerEvents: 'none',
-      });
+      if (btnRef.current) {
+        gsap.to(btnRef.current, {
+          opacity: 0, scale: 0, duration: 0.2,
+          ease: 'power2.in',
+          pointerEvents: 'none',
+        });
+      }
 
       if (messages.length === 0) {
         setIsTyping(true);
@@ -81,11 +95,13 @@ export const ChatBot = ({ onStart }) => {
         ease: 'power2.in',
         pointerEvents: 'none',
       });
-      gsap.to(btnRef.current, {
-        opacity: 1, scale: 1, duration: 0.35, delay: 0.15,
-        ease: 'back.out(1.4)',
-        pointerEvents: 'auto',
-      });
+      if (btnRef.current) {
+        gsap.to(btnRef.current, {
+          opacity: 1, scale: 1, duration: 0.35, delay: 0.15,
+          ease: 'back.out(1.4)',
+          pointerEvents: 'auto',
+        });
+      }
     }
   }, [isOpen]);
 
@@ -93,9 +109,6 @@ export const ChatBot = ({ onStart }) => {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping, showOptions]);
-
-  const handleClose = () => setIsOpen(false);
-  const handleOpen = () => setIsOpen(true);
 
   const handleQuestionClick = (faq) => {
     setShowOptions(false);
@@ -116,11 +129,11 @@ export const ChatBot = ({ onStart }) => {
 
   return (
     <>
-      {/* Floating Toggle Button */}
+      {/* Floating Toggle Button (PC ONLY) */}
       <button
         ref={btnRef}
         onClick={handleOpen}
-        className="fixed bottom-24 right-6 md:bottom-32 md:right-10 w-14 h-14 rounded-full bg-accent text-primary flex items-center justify-center shadow-2xl hover:scale-110 transition-transform duration-300 z-[900]"
+        className="hidden md:flex fixed md:bottom-12 md:left-12 w-14 h-14 rounded-full bg-accent text-primary items-center justify-center shadow-2xl hover:scale-110 transition-transform duration-300 z-[900]"
       >
         <Wrench className="w-6 h-6" />
       </button>
@@ -128,7 +141,7 @@ export const ChatBot = ({ onStart }) => {
       {/* Chat Window — visibility controlled by GSAP only */}
       <div
         ref={chatRef}
-        className="fixed bottom-24 right-6 md:bottom-32 md:right-10 w-[calc(100vw-48px)] md:w-[400px] h-[550px] max-h-[80vh] bg-primary/95 backdrop-blur-2xl border border-white/10 rounded-[2rem] shadow-2xl z-[950] flex flex-col overflow-hidden origin-bottom-right"
+        className="fixed top-24 left-1/2 -translate-x-1/2 md:top-auto md:translate-x-0 md:bottom-32 md:left-12 w-[calc(100vw-48px)] md:w-[400px] h-[600px] md:h-[550px] max-h-[80vh] bg-primary/95 backdrop-blur-2xl border border-white/10 rounded-[2rem] shadow-2xl z-[950] flex flex-col overflow-hidden origin-top md:origin-bottom-left"
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-primary/50 flex-shrink-0">

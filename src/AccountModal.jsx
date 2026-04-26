@@ -47,16 +47,17 @@ export const AccountModal = ({ isOpen, onClose, session }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 sm:p-6 bg-background/80 backdrop-blur-xl">
+    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 sm:p-6 bg-background/80 backdrop-blur-xl" onClick={handleClose}>
       <div 
         ref={modalRef}
+        onClick={(e) => e.stopPropagation()}
         className="relative w-full max-w-sm bg-primary/90 backdrop-blur-3xl border border-white/10 rounded-[2rem] p-8 shadow-2xl overflow-hidden"
       >
         <button 
           onClick={handleClose}
-          className="absolute top-6 right-6 p-2 rounded-full hover:bg-white/10 transition-colors z-10"
+          className="absolute top-4 right-4 md:top-6 md:right-6 p-3 md:p-2 rounded-full hover:bg-white/10 transition-colors z-10"
         >
-          <X className="w-5 h-5 text-white/60 hover:text-white" />
+          <X className="w-6 h-6 md:w-5 md:h-5 text-white/60 hover:text-white" />
         </button>
 
         <div className="relative z-10 flex flex-col items-center text-center">
@@ -70,14 +71,14 @@ export const AccountModal = ({ isOpen, onClose, session }) => {
           <div className="w-full space-y-3">
             <button 
               onClick={handleGoToChat}
-              className="w-full flex items-center justify-center gap-2 bg-white/10 text-white py-3 rounded-xl hover:bg-white/20 transition-colors"
+              className="w-full flex items-center justify-center gap-2 bg-white/10 text-white py-4 md:py-3 rounded-xl hover:bg-white/20 transition-colors font-bold"
             >
               <MessageSquare className="w-4 h-4" />
               Abrir Chat
             </button>
             <button 
               onClick={handleLogout}
-              className="w-full flex items-center justify-center gap-2 bg-red-500/10 text-red-400 py-3 rounded-xl hover:bg-red-500/20 transition-colors"
+              className="w-full flex items-center justify-center gap-2 bg-red-500/10 text-red-400 py-4 md:py-3 rounded-xl hover:bg-red-500/20 transition-colors font-bold"
             >
               <LogOut className="w-4 h-4" />
               Sair da Conta

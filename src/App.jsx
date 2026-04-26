@@ -34,7 +34,7 @@ const Noise = () => (
   <div className="noise-overlay pointer-events-none fixed inset-0 z-[999] opacity-[0.03]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
 );
 
-const Navbar = ({ session, onOpenAccount, onOpenChat }) => {
+const Navbar = ({ session, onOpenAccount, onOpenChat, onOpenSupport }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const navRef = useRef(null);
 
@@ -66,6 +66,13 @@ const Navbar = ({ session, onOpenAccount, onOpenChat }) => {
         
         {/* Dynamic Buttons */}
         <div className="flex items-center gap-3 md:pl-4 md:border-l border-white/10">
+          <button 
+            onClick={onOpenSupport}
+            className="flex md:hidden items-center justify-center w-10 h-10 rounded-full bg-accent text-primary shadow-lg"
+            title="Suporte"
+          >
+            <Wrench className="w-5 h-5" />
+          </button>
           {session ? (
             <>
               <button 
@@ -544,6 +551,7 @@ export default function App() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const [isSupportOpen, setIsSupportOpen] = useState(false);
   const [session, setSession] = useState(null);
   const navigate = useNavigate();
 
@@ -619,6 +627,7 @@ export default function App() {
         session={session} 
         onOpenAccount={() => setIsAccountOpen(true)} 
         onOpenChat={handleChatClick} 
+        onOpenSupport={() => setIsSupportOpen(true)}
       />
       <Hero onStart={() => setIsContactOpen(true)} />
       <FeatureCards />
@@ -629,7 +638,7 @@ export default function App() {
       <ContactModal isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} />
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
       <AccountModal isOpen={isAccountOpen} onClose={() => setIsAccountOpen(false)} session={session} />
-      <ChatBot onStart={handleChatClick} />
+      <ChatBot isOpen={isSupportOpen} onClose={() => setIsSupportOpen(false)} onStart={handleChatClick} />
     </main>
   );
 }
