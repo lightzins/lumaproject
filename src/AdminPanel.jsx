@@ -74,19 +74,34 @@ export const AdminPanel = () => {
   }, [navigate, selectedItem, activeTab]);
 
   const fetchClients = async () => {
-    const { data } = await supabase
+    // Buscar perfis ativos
+    const { data: profiles } = await supabase
       .from('profiles')
       .select('*')
       .eq('role', 'client')
       .neq('status', 'archived')
       .order('created_at', { ascending: false });
-    if (data) setClients(data);
+
+    // Buscar orçamentos respondidos (que ainda não viraram conta)
+    const { data: respondedLeads } = await supabase
+      .from('leads')
+      .select('*')
+      .eq('status', 'responded')
+      .order('created_at', { ascending: false });
+
+    const merged = [
+      ...(profiles || []).map(p => ({ ...p, type: 'profile' })),
+      ...(respondedLeads || []).map(l => ({ ...l, type: 'lead', name: l.name + ' (Lead)' }))
+    ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+    setClients(merged);
   };
 
   const fetchLeads = async () => {
     const { data } = await supabase
       .from('leads')
       .select('*')
+      .eq('status', 'new')
       .order('created_at', { ascending: false });
     if (data) setLeads(data);
   };
@@ -94,12 +109,17 @@ export const AdminPanel = () => {
   const selectItem = async (item) => {
     setSelectedItem(item);
     if (activeTab === 'chats') {
-      const { data } = await supabase
-        .from('messages')
-        .select('*')
-        .or(`sender_id.eq.${item.id},receiver_id.eq.${item.id}`)
-        .order('created_at', { ascending: true });
-      if (data) setMessages(data);
+      if (item.type === 'profile') {
+        const { data } = await supabase
+          .from('messages')
+          .select('*')
+          .or(`sender_id.eq.${item.id},receiver_id.eq.${item.id}`)
+          .order('created_at', { ascending: true });
+        if (data) setMessages(data);
+      } else {
+        // Para leads no chat, não há mensagens ainda
+        setMessages([]);
+      }
     }
   };
 
@@ -209,8 +229,8 @@ export const AdminPanel = () => {
               onClick={() => selectItem(item)}
               className={`w-full p-5 flex items-center gap-4 text-left border-b border-white/5 transition-all hover:bg-white/5 ${selectedItem?.id === item.id ? 'bg-accent/5 border-l-2 border-l-accent' : ''}`}
             >
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${activeTab === 'leads' ? 'bg-accent/20 text-accent' : 'bg-white/10 text-white'}`}>
-                <span className="font-bold text-xs uppercase">{(item.name || item.email || '?').charAt(0)}</span>
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${item.type === 'lead' ? 'bg-accent/20 text-accent' : 'bg-white/10 text-white'}`}>
+                {item.type === 'lead' ? <Sparkles className="w-5 h-5" /> : <span className="font-bold text-xs uppercase">{(item.name || item.email || '?').charAt(0)}</span>}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
@@ -300,7 +320,7 @@ export const AdminPanel = () => {
             </header>
 
             <div className="flex-1 overflow-y-auto p-3 md:p-8 space-y-6 md:space-y-8 custom-scrollbar">
-              {activeTab === 'leads' ? (
+              {activeTab === 'leads' || selectedItem?.type === 'lead' ? (
                 <div className="max-w-2xl mx-auto w-full">
                   <div className="bg-white/5 border border-white/10 rounded-3xl md:rounded-[2.5rem] p-4 md:p-10 space-y-5 md:space-y-8 relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-accent/10 blur-[50px] -mr-16 -mt-16" />
@@ -351,24 +371,15 @@ export const AdminPanel = () => {
                           
                           if (profile) {
                             setActiveTab('chats');
-                            setSelectedItem(profile);
-                            // Fetch messages for this profile
-                            const { data: msgs } = await supabase
-                              .from('messages')
-                              .select('*')
-                              .or(`sender_id.eq.${profile.id},receiver_id.eq.${profile.id}`)
-                              .order('created_at', { ascending: true });
-                            if (msgs) setMessages(msgs);
+                            setSelectedItem({ ...profile, type: 'profile' });
+                            fetchClients();
                           } else {
-                            setConfirmConfig({
-                              isOpen: true,
-                              title: "Cliente sem Conta",
-                              message: "Este cliente ainda não se cadastrou no site. Você não pode iniciar um chat até que ele crie uma conta.",
-                              confirmText: "Entendido",
-                              cancelText: "Fechar",
-                              variant: "info",
-                              onConfirm: () => {}
-                            });
+                            // Marcar lead como respondido para aparecer na aba conversas
+                            await supabase.from('leads').update({ status: 'responded' }).eq('id', selectedItem.id);
+                            setActiveTab('chats');
+                            setSelectedItem({ ...selectedItem, type: 'lead' });
+                            fetchClients();
+                            fetchLeads();
                           }
                         }}
                         className="w-full md:w-auto px-6 py-3 bg-accent text-primary rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-white transition-all flex items-center justify-center gap-2 order-1 md:order-2"
@@ -413,7 +424,7 @@ export const AdminPanel = () => {
               )}
             </div>
 
-            {activeTab === 'chats' && (
+            {activeTab === 'chats' && selectedItem?.type === 'profile' && (
               <footer className="p-8 border-t border-white/5 bg-primary/50 backdrop-blur-xl">
                 <form onSubmit={handleSend} className="relative max-w-4xl mx-auto">
                   <input
