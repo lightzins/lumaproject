@@ -116,10 +116,10 @@ export const AdminPanel = () => {
     c.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (loading) return <div className="min-h-screen bg-background flex items-center justify-center text-accent">Carregando Painel Admin...</div>;
+  if (loading) return <div className="min-h-screen bg-primary flex items-center justify-center text-accent">Carregando Painel Admin...</div>;
 
   return (
-    <div className="flex h-screen bg-background overflow-hidden text-white">
+    <div className="flex h-screen bg-primary overflow-hidden text-white">
       
       {/* Sidebar: Lista de Clientes */}
       <aside className="w-full md:w-80 lg:w-96 flex-shrink-0 border-r border-white/5 bg-primary/30 flex flex-col h-full">
@@ -177,7 +177,7 @@ export const AdminPanel = () => {
       </aside>
 
       {/* Main Content: Chat View */}
-      <main className="flex-1 flex flex-col h-full bg-background relative ${selectedClient ? 'hidden md:flex' : 'hidden md:flex'}">
+      <main className={`flex-1 flex flex-col h-full bg-primary relative ${!selectedClient ? 'hidden md:flex' : 'flex'}`}>
         {!selectedClient ? (
           <div className="flex-1 flex flex-col items-center justify-center text-center opacity-50 space-y-4">
             <MessageSquare className="w-16 h-16 text-white/20" />

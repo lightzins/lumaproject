@@ -84,11 +84,11 @@ export const ClientChat = () => {
   };
 
   if (loading) {
-    return <div className="min-h-screen bg-background flex items-center justify-center text-accent">Carregando...</div>;
+    return <div className="min-h-screen bg-primary flex items-center justify-center text-accent">Carregando...</div>;
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-primary flex flex-col">
       {/* Header */}
       <header className="bg-primary border-b border-white/5 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
         <div className="flex items-center gap-4">
