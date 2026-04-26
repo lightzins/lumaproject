@@ -144,7 +144,7 @@ export const ContactModal = ({ isOpen, onClose }) => {
                   <input 
                     type="text" value={formData.budget}
                     onChange={e => setFormData({...formData, budget: e.target.value})}
-                    placeholder="Ex: R$ 500 - R$ 2.000"
+                    placeholder="Ex: R$ 100 - R$ 300"
                     className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white placeholder:text-white/20 focus:outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/50 transition-all"
                   />
                 </div>
