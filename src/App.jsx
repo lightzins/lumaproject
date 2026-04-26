@@ -11,7 +11,10 @@ import {
   CheckCircle2, 
   Cpu, 
   Layers, 
-  Activity 
+  Activity,
+  User,
+  MessageSquare,
+  Wrench
 } from 'lucide-react';
 import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
@@ -47,13 +50,13 @@ const Navbar = ({ session, onOpenAccount, onOpenChat }) => {
     <nav 
       ref={navRef}
       className={cn(
-        "hidden md:flex fixed top-8 left-1/2 -translate-x-1/2 z-[100] transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] items-center px-4 py-2 rounded-full border border-white/10 shadow-2xl",
+        "flex fixed top-4 md:top-8 right-4 md:right-auto md:left-1/2 md:-translate-x-1/2 z-[100] transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] items-center px-4 py-2 rounded-full md:border border-white/10 md:shadow-2xl",
         isScrolled 
           ? "bg-primary/90 backdrop-blur-xl w-auto" 
-          : "bg-primary/40 backdrop-blur-md w-auto"
+          : "bg-transparent md:bg-primary/40 md:backdrop-blur-md w-auto"
       )}
     >
-      <div className="flex items-center gap-8 px-4 text-white">
+      <div className="flex items-center gap-8 md:px-4 text-white">
         <div className="hidden md:flex items-center gap-6 text-[10px] uppercase tracking-[0.2em] font-bold opacity-70">
           <a href="#features" className="hover:opacity-100 transition-opacity">Serviços</a>
           <a href="#philosophy" className="hover:opacity-100 transition-opacity">Filosofia</a>
@@ -62,28 +65,31 @@ const Navbar = ({ session, onOpenAccount, onOpenChat }) => {
         </div>
         
         {/* Dynamic Buttons */}
-        <div className="flex items-center gap-3 pl-4 border-l border-white/10">
+        <div className="flex items-center gap-3 md:pl-4 md:border-l border-white/10">
           {session ? (
             <>
               <button 
                 onClick={onOpenAccount}
-                className="text-[10px] uppercase tracking-widest font-bold opacity-70 hover:opacity-100 transition-opacity whitespace-nowrap"
+                className="flex items-center justify-center w-10 h-10 md:w-auto md:h-auto rounded-full bg-white/10 md:bg-transparent text-[10px] uppercase tracking-widest font-bold opacity-100 md:opacity-70 hover:opacity-100 transition-all whitespace-nowrap"
               >
-                Minha Conta
+                <User className="w-5 h-5 md:hidden" />
+                <span className="hidden md:inline">Minha Conta</span>
               </button>
               <button 
                 onClick={onOpenChat}
-                className="bg-accent text-primary px-4 py-1.5 rounded-full text-[10px] uppercase tracking-widest font-bold hover:bg-white transition-colors whitespace-nowrap"
+                className="flex items-center justify-center w-10 h-10 md:w-auto md:h-auto bg-accent text-primary md:px-4 md:py-1.5 rounded-full text-[10px] uppercase tracking-widest font-bold hover:bg-white transition-colors whitespace-nowrap shadow-lg md:shadow-none"
               >
-                Abrir Chat
+                <MessageSquare className="w-5 h-5 md:hidden" />
+                <span className="hidden md:inline">Abrir Chat</span>
               </button>
             </>
           ) : (
             <button 
               onClick={onOpenChat}
-              className="bg-white/10 text-white px-4 py-1.5 rounded-full text-[10px] uppercase tracking-widest font-bold hover:bg-white/20 transition-colors whitespace-nowrap"
+              className="flex items-center justify-center gap-2 bg-white/10 md:bg-white/10 text-white w-10 h-10 md:w-auto md:h-auto md:px-4 md:py-1.5 rounded-full text-[10px] uppercase tracking-widest font-bold hover:bg-white/20 transition-colors whitespace-nowrap shadow-lg md:shadow-none backdrop-blur-md"
             >
-              Área do Cliente
+              <User className="w-5 h-5 md:hidden" />
+              <span className="hidden md:inline">Área do Cliente</span>
             </button>
           )}
         </div>

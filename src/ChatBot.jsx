@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MessageSquare, X, Bot, ArrowRight } from 'lucide-react';
+import { MessageSquare, X, Bot, ArrowRight, Wrench } from 'lucide-react';
 import { gsap } from 'gsap';
 
 const faqs = [
@@ -122,7 +122,7 @@ export const ChatBot = ({ onStart }) => {
         onClick={handleOpen}
         className="fixed bottom-24 right-6 md:bottom-32 md:right-10 w-14 h-14 rounded-full bg-accent text-primary flex items-center justify-center shadow-2xl hover:scale-110 transition-transform duration-300 z-[900]"
       >
-        <MessageSquare className="w-6 h-6" />
+        <Wrench className="w-6 h-6" />
       </button>
 
       {/* Chat Window — visibility controlled by GSAP only */}
