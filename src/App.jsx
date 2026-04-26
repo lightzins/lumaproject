@@ -67,13 +67,13 @@ const Navbar = ({ session, onOpenAccount, onOpenChat }) => {
             <>
               <button 
                 onClick={onOpenAccount}
-                className="text-[10px] uppercase tracking-widest font-bold opacity-70 hover:opacity-100 transition-opacity"
+                className="text-[10px] uppercase tracking-widest font-bold opacity-70 hover:opacity-100 transition-opacity whitespace-nowrap"
               >
                 Minha Conta
               </button>
               <button 
                 onClick={onOpenChat}
-                className="bg-accent text-primary px-4 py-1.5 rounded-full text-[10px] uppercase tracking-widest font-bold hover:bg-white transition-colors"
+                className="bg-accent text-primary px-4 py-1.5 rounded-full text-[10px] uppercase tracking-widest font-bold hover:bg-white transition-colors whitespace-nowrap"
               >
                 Abrir Chat
               </button>
@@ -81,7 +81,7 @@ const Navbar = ({ session, onOpenAccount, onOpenChat }) => {
           ) : (
             <button 
               onClick={onOpenChat}
-              className="bg-white/10 text-white px-4 py-1.5 rounded-full text-[10px] uppercase tracking-widest font-bold hover:bg-white/20 transition-colors"
+              className="bg-white/10 text-white px-4 py-1.5 rounded-full text-[10px] uppercase tracking-widest font-bold hover:bg-white/20 transition-colors whitespace-nowrap"
             >
               Área do Cliente
             </button>
