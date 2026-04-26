@@ -97,8 +97,9 @@ export const ClientChat = () => {
       {/* Header */}
       <header className="bg-primary border-b border-white/5 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
         <div className="flex items-center gap-4">
-          <button onClick={() => navigate('/')} className="text-white/50 hover:text-white transition-colors">
+          <button onClick={() => navigate('/')} className="flex items-center gap-2 text-white/50 hover:text-white transition-colors">
             <ArrowLeft className="w-5 h-5" />
+            <span className="text-sm font-medium hidden sm:inline">Voltar</span>
           </button>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center border border-accent/30 relative">

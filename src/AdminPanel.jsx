@@ -133,9 +133,14 @@ export const AdminPanel = () => {
               <p className="text-xs text-white/40">{user.email}</p>
             </div>
           </div>
-          <button onClick={handleLogout} className="p-2 hover:bg-white/5 rounded-full text-white/40 hover:text-red-400 transition-colors">
-            <LogOut className="w-5 h-5" />
-          </button>
+          <div className="flex items-center gap-1">
+            <button onClick={() => navigate('/')} className="p-2 hover:bg-white/5 rounded-full text-white/40 hover:text-white transition-colors" title="Voltar ao Site">
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <button onClick={handleLogout} className="p-2 hover:bg-white/5 rounded-full text-white/40 hover:text-red-400 transition-colors" title="Sair">
+              <LogOut className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         <div className="p-4 border-b border-white/5">
