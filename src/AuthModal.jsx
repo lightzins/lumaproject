@@ -77,7 +77,8 @@ export const AuthModal = ({ isOpen, onClose }) => {
         navigate('/chat');
       }
     } catch (err) {
-      setError(err.message === 'Invalid login credentials' ? 'E-mail ou senha incorretos.' : 'Ocorreu um erro. Verifique seus dados.');
+      console.error(err);
+      setError("Erro Supabase: " + err.message);
     } finally {
       setLoading(false);
     }
