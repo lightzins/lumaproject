@@ -65,7 +65,7 @@ const Navbar = () => {
   );
 };
 
-import { ContactModal } from './ContactModal';
+import { AuthModal } from './AuthModal';
 import { ChatBot } from './ChatBot';
 
 const Hero = ({ onStart }) => {
@@ -550,7 +550,7 @@ export default function App() {
       <Protocol />
       <Pricing onStart={() => setIsModalOpen(true)} />
       <Footer />
-      <ContactModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <AuthModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
       <ChatBot onStart={() => setIsModalOpen(true)} />
     </main>
   );
