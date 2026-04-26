@@ -80,7 +80,7 @@ export const ContactModal = ({ isOpen, onClose }) => {
               </div>
               <h2 className="text-2xl font-bold text-white mb-2">Ideia Recebida!</h2>
               <p className="text-white/60 mb-8 max-w-xs mx-auto">
-                Nossa equipe vai analisar o seu projeto e entraremos em contato em até 24 horas.
+                Nossa equipe vai analisar o seu projeto e retornaremos no chat em até 24 horas.
               </p>
               <button 
                 onClick={handleClose}
@@ -97,7 +97,7 @@ export const ContactModal = ({ isOpen, onClose }) => {
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold text-white tracking-tight">Qual é a sua ideia?</h2>
-                  <p className="text-white/50 text-sm mt-1">Preencha os detalhes e retornaremos em até 24h.</p>
+                  <p className="text-white/50 text-sm mt-1">Preencha os detalhes e retornaremos no chat em até 24 horas.</p>
                 </div>
               </div>
 

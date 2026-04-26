@@ -339,8 +339,43 @@ export const AdminPanel = () => {
                       <p className="text-xs md:text-sm leading-relaxed text-white/80">{selectedItem.idea}</p>
                     </div>
 
-                    <div className="pt-6 border-t border-white/5">
-                      <p className="text-[9px] md:text-[10px] text-white/20 font-mono">RECEBIDO_EM: {new Date(selectedItem.created_at).toLocaleString()}</p>
+                    <div className="pt-6 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+                      <p className="text-[9px] md:text-[10px] text-white/20 font-mono order-2 md:order-1">RECEBIDO_EM: {new Date(selectedItem.created_at).toLocaleString()}</p>
+                      <button
+                        onClick={async () => {
+                          const { data: profile } = await supabase
+                            .from('profiles')
+                            .select('*')
+                            .eq('email', selectedItem.email)
+                            .single();
+                          
+                          if (profile) {
+                            setActiveTab('chats');
+                            setSelectedItem(profile);
+                            // Fetch messages for this profile
+                            const { data: msgs } = await supabase
+                              .from('messages')
+                              .select('*')
+                              .or(`sender_id.eq.${profile.id},receiver_id.eq.${profile.id}`)
+                              .order('created_at', { ascending: true });
+                            if (msgs) setMessages(msgs);
+                          } else {
+                            setConfirmConfig({
+                              isOpen: true,
+                              title: "Cliente sem Conta",
+                              message: "Este cliente ainda não se cadastrou no site. Você não pode iniciar um chat até que ele crie uma conta.",
+                              confirmText: "Entendido",
+                              cancelText: "Fechar",
+                              variant: "info",
+                              onConfirm: () => {}
+                            });
+                          }
+                        }}
+                        className="w-full md:w-auto px-6 py-3 bg-accent text-primary rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-white transition-all flex items-center justify-center gap-2 order-1 md:order-2"
+                      >
+                        <MessageSquare className="w-4 h-4" />
+                        Responder no Chat
+                      </button>
                     </div>
                   </div>
                 </div>
