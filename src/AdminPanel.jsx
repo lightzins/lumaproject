@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from './supabase';
 import { useNavigate } from 'react-router-dom';
-import { Users, LogOut, Send, Search, MessageSquare, Bot } from 'lucide-react';
+import { Users, LogOut, Send, Search, MessageSquare, Bot, ArrowLeft } from 'lucide-react';
 
 export const AdminPanel = () => {
   const [clients, setClients] = useState([]);
@@ -122,7 +122,7 @@ export const AdminPanel = () => {
     <div className="flex h-screen bg-primary overflow-hidden text-white">
       
       {/* Sidebar: Lista de Clientes */}
-      <aside className="w-full md:w-80 lg:w-96 flex-shrink-0 border-r border-white/5 bg-primary/30 flex flex-col h-full">
+      <aside className={`w-full md:w-80 lg:w-96 flex-shrink-0 border-r border-white/5 bg-primary/30 flex-col h-full ${selectedClient ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-6 border-b border-white/5 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center border border-accent/30">
