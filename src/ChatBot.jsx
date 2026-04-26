@@ -120,7 +120,7 @@ export const ChatBot = ({ onStart }) => {
       <button
         ref={btnRef}
         onClick={handleOpen}
-        className="fixed bottom-6 right-6 md:bottom-10 md:right-10 w-14 h-14 rounded-full bg-accent text-primary flex items-center justify-center shadow-2xl hover:scale-110 transition-transform duration-300 z-[900]"
+        className="fixed bottom-24 right-6 md:bottom-32 md:right-10 w-14 h-14 rounded-full bg-accent text-primary flex items-center justify-center shadow-2xl hover:scale-110 transition-transform duration-300 z-[900]"
       >
         <MessageSquare className="w-6 h-6" />
       </button>
@@ -128,7 +128,7 @@ export const ChatBot = ({ onStart }) => {
       {/* Chat Window — visibility controlled by GSAP only */}
       <div
         ref={chatRef}
-        className="fixed bottom-6 right-6 md:bottom-10 md:right-10 w-[calc(100vw-48px)] md:w-[400px] h-[550px] max-h-[85vh] bg-primary/95 backdrop-blur-2xl border border-white/10 rounded-[2rem] shadow-2xl z-[950] flex flex-col overflow-hidden origin-bottom-right"
+        className="fixed bottom-24 right-6 md:bottom-32 md:right-10 w-[calc(100vw-48px)] md:w-[400px] h-[550px] max-h-[80vh] bg-primary/95 backdrop-blur-2xl border border-white/10 rounded-[2rem] shadow-2xl z-[950] flex flex-col overflow-hidden origin-bottom-right"
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-primary/50 flex-shrink-0">
