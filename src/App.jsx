@@ -31,7 +31,7 @@ const Noise = () => (
   <div className="noise-overlay pointer-events-none fixed inset-0 z-[999] opacity-[0.03]" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }} />
 );
 
-const Navbar = () => {
+const Navbar = ({ session, onOpenAccount, onOpenChat }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const navRef = useRef(null);
 
@@ -54,17 +54,45 @@ const Navbar = () => {
       )}
     >
       <div className="flex items-center gap-8 px-4 text-white">
-        <div className="hidden md:flex items-center gap-8 text-[10px] uppercase tracking-[0.25em] font-bold opacity-70">
+        <div className="hidden md:flex items-center gap-6 text-[10px] uppercase tracking-[0.2em] font-bold opacity-70">
           <a href="#features" className="hover:opacity-100 transition-opacity">Serviços</a>
           <a href="#philosophy" className="hover:opacity-100 transition-opacity">Filosofia</a>
           <a href="#protocol" className="hover:opacity-100 transition-opacity">Protocolo</a>
           <a href="#pricing" className="hover:opacity-100 transition-opacity">Investimento</a>
+        </div>
+        
+        {/* Dynamic Buttons */}
+        <div className="flex items-center gap-3 pl-4 border-l border-white/10">
+          {session ? (
+            <>
+              <button 
+                onClick={onOpenAccount}
+                className="text-[10px] uppercase tracking-widest font-bold opacity-70 hover:opacity-100 transition-opacity"
+              >
+                Minha Conta
+              </button>
+              <button 
+                onClick={onOpenChat}
+                className="bg-accent text-primary px-4 py-1.5 rounded-full text-[10px] uppercase tracking-widest font-bold hover:bg-white transition-colors"
+              >
+                Abrir Chat
+              </button>
+            </>
+          ) : (
+            <button 
+              onClick={onOpenChat}
+              className="bg-white/10 text-white px-4 py-1.5 rounded-full text-[10px] uppercase tracking-widest font-bold hover:bg-white/20 transition-colors"
+            >
+              Área do Cliente
+            </button>
+          )}
         </div>
       </div>
     </nav>
   );
 };
 
+import { AccountModal } from './AccountModal';
 import { ContactModal } from './ContactModal';
 import { AuthModal } from './AuthModal';
 import { ChatBot } from './ChatBot';
@@ -509,14 +537,26 @@ const Footer = () => {
 export default function App() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
+  const [session, setSession] = useState(null);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   const handleChatClick = async () => {
-    // Check if user is already logged in
-    const { data: { session } } = await supabase.auth.getSession();
-    
     if (session) {
-      // User is logged in! Let's check if they are admin or client
       const { data: profile } = await supabase
         .from('profiles')
         .select('*')
@@ -529,7 +569,6 @@ export default function App() {
         navigate('/chat');
       }
     } else {
-      // Not logged in, open the AuthModal
       setIsAuthOpen(true);
     }
   };
@@ -553,7 +592,6 @@ export default function App() {
 
     requestAnimationFrame(raf);
 
-    // Sync GSAP ScrollTrigger with Lenis
     lenis.on('scroll', ScrollTrigger.update);
 
     gsap.ticker.add((time) => {
@@ -571,7 +609,11 @@ export default function App() {
   return (
     <main className="selection:bg-accent selection:text-primary antialiased">
       <Noise />
-      <Navbar />
+      <Navbar 
+        session={session} 
+        onOpenAccount={() => setIsAccountOpen(true)} 
+        onOpenChat={handleChatClick} 
+      />
       <Hero onStart={() => setIsContactOpen(true)} />
       <FeatureCards />
       <Philosophy />
@@ -580,6 +622,7 @@ export default function App() {
       <Footer />
       <ContactModal isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} />
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
+      <AccountModal isOpen={isAccountOpen} onClose={() => setIsAccountOpen(false)} session={session} />
       <ChatBot onStart={handleChatClick} />
     </main>
   );
