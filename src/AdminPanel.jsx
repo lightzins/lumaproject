@@ -261,7 +261,13 @@ export const AdminPanel = () => {
               <div className="flex items-center gap-2 flex-shrink-0">
                 {activeTab === 'chats' ? (
                   <button 
-                    onClick={() => { if(confirm('Encerrar esta conversa?')) setSelectedItem(null); }}
+                    onClick={async () => { 
+                      if(confirm('Encerrar esta conversa? Ela será arquivada.')) {
+                        const { error } = await supabase.from('profiles').update({ status: 'archived' }).eq('id', selectedItem.id);
+                        if (error) alert(error.message);
+                        else { setSelectedItem(null); fetchClients(); }
+                      } 
+                    }}
                     className="flex items-center gap-2 px-3 md:px-4 py-2 bg-white/5 hover:bg-red-500/10 hover:text-red-400 border border-white/10 rounded-xl text-[9px] md:text-[10px] font-bold uppercase tracking-widest transition-all"
                   >
                     <CheckCircle className="w-3.5 h-3.5" />
@@ -290,17 +296,17 @@ export const AdminPanel = () => {
                       <h3 className="text-sm md:text-xl font-bold uppercase tracking-widest">Resumo do Projeto</h3>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-                      <div>
-                        <p className="text-[9px] md:text-[10px] uppercase tracking-widest text-white/30 mb-1 md:mb-2">Cliente</p>
-                        <p className="font-bold text-sm md:text-base">{selectedItem.name}</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                      <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
+                        <p className="text-[9px] md:text-[10px] uppercase tracking-widest text-white/30 mb-2">Cliente</p>
+                        <p className="font-bold text-sm md:text-base truncate">{selectedItem.name}</p>
                       </div>
-                      <div>
-                        <p className="text-[9px] md:text-[10px] uppercase tracking-widest text-white/30 mb-1 md:mb-2">Email</p>
+                      <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
+                        <p className="text-[9px] md:text-[10px] uppercase tracking-widest text-white/30 mb-2">Email</p>
                         <p className="font-mono text-[10px] md:text-sm break-all">{selectedItem.email}</p>
                       </div>
-                      <div>
-                        <p className="text-[9px] md:text-[10px] uppercase tracking-widest text-white/30 mb-1 md:mb-2">Investimento</p>
+                      <div className="p-4 bg-accent/10 rounded-2xl border border-accent/20">
+                        <p className="text-[9px] md:text-[10px] uppercase tracking-widest text-accent/60 mb-2">Investimento</p>
                         <p className="font-bold text-sm md:text-base text-accent">{selectedItem.budget || 'Não informado'}</p>
                       </div>
                     </div>
