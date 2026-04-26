@@ -5,15 +5,14 @@ import { Users, LogOut, Send, Search, MessageSquare, Bot, ArrowLeft, Sparkles, T
 import { ConfirmModal } from './ConfirmModal';
 
 export const AdminPanel = () => {
-  const [activeTab, setActiveTab] = useState('chats'); // 'chats' | 'leads'
   const [clients, setClients] = useState([]);
-  const [leads, setLeads] = useState([]);
-  const [selectedItem, setSelectedItem] = useState(null); // Can be client or lead
+  const [selectedItem, setSelectedItem] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showLeadDetails, setShowLeadDetails] = useState(false);
   const [confirmConfig, setConfirmConfig] = useState({ isOpen: false, title: '', message: '', onConfirm: () => {} });
   
   const messagesEndRef = useRef(null);
@@ -22,106 +21,73 @@ export const AdminPanel = () => {
   useEffect(() => {
     const checkAdmin = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        navigate('/');
-        return;
-      }
+      if (!session) { navigate('/'); return; }
       
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', session.user.id)
-        .single();
-        
-      if (profile?.role !== 'admin') {
-        navigate('/chat');
-        return;
-      }
+      const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
+      if (profile?.role !== 'admin') { navigate('/chat'); return; }
       
       setUser({ ...session.user, profile });
-      fetchClients();
-      fetchLeads();
+      fetchAllData();
       setLoading(false);
     };
-
     checkAdmin();
 
-    // Subscriptions
-    const clientsChannel = supabase
-      .channel('public:profiles')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => fetchClients())
-      .subscribe();
+    const profilesSub = supabase.channel('profiles_all').on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => fetchAllData()).subscribe();
+    const leadsSub = supabase.channel('leads_all').on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, () => fetchAllData()).subscribe();
+    return () => { profilesSub.unsubscribe(); leadsSub.unsubscribe(); };
+  }, []);
 
-    const leadsChannel = supabase
-      .channel('public:leads')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'leads' }, () => fetchLeads())
-      .subscribe();
+  const fetchAllData = async () => {
+    const { data: profiles } = await supabase.from('profiles').select('*').eq('role', 'client').neq('status', 'archived');
+    const { data: leads } = await supabase.from('leads').select('*');
 
-    const messagesChannel = supabase
-      .channel('public:messages_admin')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
-        if (selectedItem && activeTab === 'chats' && (payload.new.sender_id === selectedItem.id || payload.new.receiver_id === selectedItem.id)) {
-          setMessages(prev => [...prev, payload.new]);
-        }
-      })
-      .subscribe();
+    const leadMap = {};
+    (leads || []).forEach(l => { leadMap[l.email] = l; });
 
-    return () => {
-      supabase.removeChannel(clientsChannel);
-      supabase.removeChannel(leadsChannel);
-      supabase.removeChannel(messagesChannel);
-    };
-  }, [navigate, selectedItem, activeTab]);
+    const merged = (profiles || []).map(p => ({
+      ...p,
+      type: 'profile',
+      lead: leadMap[p.email] || null
+    }));
 
-  const fetchClients = async () => {
-    // Buscar perfis ativos
-    const { data: profiles } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('role', 'client')
-      .neq('status', 'archived')
-      .order('created_at', { ascending: false });
+    const profileEmails = new Set(merged.map(p => p.email));
+    (leads || []).forEach(l => {
+      if (!profileEmails.has(l.email)) {
+        merged.push({
+          ...l,
+          id: l.id,
+          name: l.name,
+          email: l.email,
+          type: 'lead',
+          lead: l
+        });
+      }
+    });
 
-    // Buscar orçamentos respondidos (que ainda não viraram conta)
-    const { data: respondedLeads } = await supabase
-      .from('leads')
-      .select('*')
-      .eq('status', 'responded')
-      .order('created_at', { ascending: false });
-
-    const merged = [
-      ...(profiles || []).map(p => ({ ...p, type: 'profile' })),
-      ...(respondedLeads || []).map(l => ({ ...l, type: 'lead', name: l.name + ' (Lead)' }))
-    ].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-
-    setClients(merged);
+    setClients(merged.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)));
   };
 
-  const fetchLeads = async () => {
-    const { data } = await supabase
-      .from('leads')
-      .select('*')
-      .eq('status', 'new')
-      .order('created_at', { ascending: false });
-    if (data) setLeads(data);
-  };
-
-  const selectItem = async (item) => {
-    setSelectedItem(item);
-    if (activeTab === 'chats') {
-      if (item.type === 'profile') {
+  useEffect(() => {
+    if (selectedItem) {
+      const fetchMessages = async () => {
         const { data } = await supabase
           .from('messages')
           .select('*')
-          .or(`sender_id.eq.${item.id},receiver_id.eq.${item.id}`)
+          .or(`and(sender_id.eq.${user.id},receiver_id.eq.${selectedItem.id}),and(sender_id.eq.${selectedItem.id},receiver_id.eq.${user.id})`)
           .order('created_at', { ascending: true });
-        if (data) setMessages(data);
-      } else {
-        // Para leads no chat, não há mensagens ainda
-        setMessages([]);
-      }
+        setMessages(data || []);
+      };
+      fetchMessages();
+
+      const sub = supabase.channel(`chat_${selectedItem.id}`)
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
+          if (payload.new.sender_id === selectedItem.id || payload.new.receiver_id === selectedItem.id) {
+            setMessages(prev => [...prev, payload.new]);
+          }
+        }).subscribe();
+      return () => { sub.unsubscribe(); };
     }
-  };
+  }, [selectedItem, user]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -129,328 +95,120 @@ export const AdminPanel = () => {
 
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!newMessage.trim() || !user || !selectedItem || activeTab !== 'chats') return;
-
+    if (!newMessage.trim() || !user || !selectedItem) return;
     const text = newMessage;
     setNewMessage('');
-
-    await supabase.from('messages').insert([{
-      text,
-      sender_id: user.id,
-      receiver_id: selectedItem.id
-    }]);
+    await supabase.from('messages').insert([{ text, sender_id: user.id, receiver_id: selectedItem.id }]);
   };
 
-  const handleRemoveLead = async (id) => {
-    setConfirmConfig({
-      isOpen: true,
-      title: "Remover Orçamento",
-      message: "Tem certeza que deseja excluir permanentemente este orçamento? Esta ação não pode ser desfeita.",
-      onConfirm: async () => {
-        await supabase.from('leads').delete().eq('id', id);
-        setSelectedItem(null);
-        fetchLeads();
-      }
-    });
-  };
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate('/');
-  };
-
-  const filteredItems = (activeTab === 'chats' ? clients : leads).filter(item => 
+  const filteredItems = clients.filter(item => 
     (item.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
     (item.email || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (loading) return <div className="min-h-screen bg-primary flex items-center justify-center text-accent font-mono tracking-widest uppercase text-xs">Carregando Painel Admin...</div>;
+  if (loading) return <div className="min-h-screen bg-primary flex items-center justify-center text-accent font-mono text-xs uppercase tracking-widest">Carregando...</div>;
 
   return (
     <div className="flex h-screen bg-primary overflow-hidden text-white font-sans">
-      
-      {/* Sidebar */}
-      <aside className={`w-full md:w-80 lg:w-96 flex-shrink-0 border-r border-white/5 bg-primary/30 flex-col h-full ${selectedItem ? 'hidden md:flex' : 'flex'}`}>
+      <aside className={`w-full md:w-80 lg:w-96 flex-shrink-0 border-r border-white/5 bg-primary/30 flex flex-col h-full ${selectedItem ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-6 border-b border-white/5 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center border border-accent/30">
-              <Bot className="w-5 h-5 text-accent" />
-            </div>
-            <div>
-              <h2 className="font-bold tracking-tight text-sm uppercase">Lume Studio</h2>
-              <p className="text-[10px] text-white/40 font-mono">ADMIN_SYSTEM</p>
-            </div>
+            <div className="w-10 h-10 rounded-xl bg-accent/20 flex items-center justify-center border border-accent/30"><Bot className="w-5 h-5 text-accent" /></div>
+            <div><h2 className="font-bold text-sm uppercase tracking-tight">Lume Studio</h2><p className="text-[10px] text-white/40 font-mono">ADMIN_SYSTEM</p></div>
           </div>
-          <div className="flex items-center gap-1">
-            <button onClick={() => navigate('/')} className="p-2 hover:bg-white/5 rounded-full text-white/40 hover:text-white transition-colors">
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <button onClick={handleLogout} className="p-2 hover:bg-white/5 rounded-full text-white/40 hover:text-red-400 transition-colors">
-              <LogOut className="w-5 h-5" />
-            </button>
+          <div className="flex gap-1">
+            <button onClick={() => navigate('/')} className="p-2 text-white/40 hover:text-white"><ArrowLeft className="w-5 h-5" /></button>
+            <button onClick={() => supabase.auth.signOut().then(() => navigate('/'))} className="p-2 text-white/40 hover:text-red-400"><LogOut className="w-5 h-5" /></button>
           </div>
         </div>
 
-        {/* Tab Switcher */}
-        <div className="flex p-2 bg-black/20 m-4 rounded-xl border border-white/5">
-          <button 
-            onClick={() => { setActiveTab('chats'); setSelectedItem(null); }}
-            className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'chats' ? 'bg-accent text-primary shadow-lg' : 'text-white/40 hover:text-white'}`}
-          >
-            <MessageSquare className="w-3.5 h-3.5" />
-            Conversas
-          </button>
-          <button 
-            onClick={() => { setActiveTab('leads'); setSelectedItem(null); }}
-            className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'leads' ? 'bg-accent text-primary shadow-lg' : 'text-white/40 hover:text-white'}`}
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            Orçamentos
-          </button>
-        </div>
-
-        <div className="px-4 pb-4">
+        <div className="p-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
-            <input 
-              type="text" 
-              placeholder={`Buscar ${activeTab === 'chats' ? 'cliente' : 'projeto'}...`} 
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-lg py-2.5 pl-10 pr-4 text-xs focus:outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/50 transition-all"
-            />
+            <input type="text" placeholder="Buscar conversa..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-sm focus:outline-none focus:border-accent/50" />
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto custom-scrollbar">
           {filteredItems.map(item => (
-            <button 
-              key={item.id}
-              onClick={() => selectItem(item)}
-              className={`w-full p-5 flex items-center gap-4 text-left border-b border-white/5 transition-all hover:bg-white/5 ${selectedItem?.id === item.id ? 'bg-accent/5 border-l-2 border-l-accent' : ''}`}
-            >
+            <button key={item.id} onClick={() => { setSelectedItem(item); setShowLeadDetails(false); }} className={`w-full p-5 flex items-center gap-4 border-b border-white/5 transition-all hover:bg-white/5 ${selectedItem?.id === item.id ? 'bg-accent/5 border-l-2 border-l-accent' : ''}`}>
               <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${item.type === 'lead' ? 'bg-accent/20 text-accent' : 'bg-white/10 text-white'}`}>
-                {item.type === 'lead' ? <Sparkles className="w-5 h-5" /> : <span className="font-bold text-xs uppercase">{(item.name || item.email || '?').charAt(0)}</span>}
+                {item.type === 'lead' ? <Sparkles className="w-4 h-4" /> : <span className="font-bold text-xs uppercase">{(item.name || '?').charAt(0)}</span>}
               </div>
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 text-left">
                 <div className="flex items-center justify-between gap-2">
-                  <h3 className="font-bold text-xs truncate uppercase tracking-wide">{item.name || 'Sem Nome'}</h3>
-                  <span className="text-[8px] font-mono opacity-30">{new Date(item.created_at).toLocaleDateString()}</span>
+                  <span className="font-bold text-sm truncate">{item.name || 'Sem Nome'}</span>
+                  {item.lead && <div className="p-1 bg-accent/20 rounded text-accent"><Sparkles className="w-3 h-3" /></div>}
                 </div>
-                <p className="text-[10px] text-white/40 truncate mt-1">{item.email}</p>
-                {activeTab === 'leads' && (
-                  <div className="flex gap-1 mt-2">
-                    {item.services?.slice(0, 2).map(s => (
-                      <span key={s} className="text-[7px] bg-accent/10 text-accent px-1.5 py-0.5 rounded uppercase font-bold">{s}</span>
-                    ))}
-                  </div>
-                )}
+                <p className="text-[10px] text-white/30 truncate font-mono uppercase">{item.type === 'lead' ? 'ORÇAMENTO NOVO' : item.email}</p>
               </div>
             </button>
           ))}
-          {filteredItems.length === 0 && (
-            <div className="p-12 text-center text-white/20 text-[10px] uppercase tracking-[0.2em] flex flex-col items-center gap-4">
-              <Search className="w-8 h-8 opacity-10" />
-              <p>Nenhum resultado encontrado.</p>
-            </div>
-          )}
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className={`flex-1 flex flex-col h-full bg-primary relative ${!selectedItem ? 'hidden md:flex' : 'flex'}`}>
-        {!selectedItem ? (
-          <div className="flex-1 flex flex-col items-center justify-center text-center space-y-6">
-            <div className="w-24 h-24 rounded-3xl bg-white/5 flex items-center justify-center border border-white/10 animate-pulse">
-              <Bot className="w-10 h-10 text-white/10" />
-            </div>
-            <div className="space-y-2">
-              <h2 className="text-xl font-bold uppercase tracking-widest text-white/80">Painel de Controle</h2>
-              <p className="text-white/30 text-[10px] uppercase tracking-[0.3em]">Selecione uma conversa para começar</p>
-            </div>
-          </div>
-        ) : (
+      <main className={`flex-1 flex flex-col bg-primary relative ${!selectedItem ? 'hidden md:flex' : 'flex'}`}>
+        {selectedItem ? (
           <>
-            <header className="px-4 md:px-8 py-4 md:py-5 border-b border-white/5 bg-primary/50 backdrop-blur-xl flex items-center justify-between sticky top-0 z-20">
-              <div className="flex items-center gap-2 md:gap-4 overflow-hidden">
-                <button onClick={() => setSelectedItem(null)} className="md:hidden text-white/50 hover:text-white flex-shrink-0">
-                  <ArrowLeft className="w-5 h-5" />
-                </button>
-                <div className="flex items-center gap-2 md:gap-3 overflow-hidden">
-                  <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center flex-shrink-0 ${activeTab === 'leads' ? 'bg-accent/20 text-accent' : 'bg-white/10 text-white'}`}>
-                    <span className="font-bold text-xs md:text-sm uppercase">{(selectedItem.name || '?').charAt(0)}</span>
-                  </div>
-                  <div className="overflow-hidden">
-                    <h2 className="font-bold text-xs md:text-sm uppercase tracking-wider truncate">{selectedItem.name || 'Cliente'}</h2>
-                    <p className="text-[8px] md:text-[10px] text-white/40 font-mono uppercase truncate">{selectedItem.email}</p>
-                  </div>
-                </div>
+            <header className="p-6 border-b border-white/5 bg-primary/80 backdrop-blur-md flex items-center justify-between sticky top-0 z-10">
+              <div className="flex items-center gap-4">
+                <button onClick={() => setSelectedItem(null)} className="md:hidden p-2 text-white/40"><ArrowLeft className="w-5 h-5" /></button>
+                <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center font-bold text-accent border border-white/10">{(selectedItem.name || '?').charAt(0)}</div>
+                <div><h3 className="font-bold text-sm uppercase tracking-widest">{selectedItem.name}</h3><p className="text-[10px] text-white/40 font-mono">{selectedItem.email}</p></div>
               </div>
-
-              <div className="flex items-center gap-2 flex-shrink-0">
-                {activeTab === 'chats' ? (
-                  <button 
-                    onClick={() => { 
-                      setConfirmConfig({
-                        isOpen: true,
-                        title: "Encerrar Conversa",
-                        message: "Deseja encerrar este atendimento? A conversa será arquivada e removida da sua lista ativa.",
-                        onConfirm: async () => {
-                          const { error } = await supabase.from('profiles').update({ status: 'archived' }).eq('id', selectedItem.id);
-                          if (error) alert(error.message);
-                          else { setSelectedItem(null); fetchClients(); }
-                        }
-                      });
-                    }}
-                    className="flex items-center gap-2 px-3 md:px-4 py-2 bg-white/5 hover:bg-red-500/10 hover:text-red-400 border border-white/10 rounded-xl text-[9px] md:text-[10px] font-bold uppercase tracking-widest transition-all"
-                  >
-                    <CheckCircle className="w-3.5 h-3.5" />
-                    <span className="hidden sm:inline">Encerrar</span>
-                  </button>
-                ) : (
-                  <button 
-                    onClick={() => handleRemoveLead(selectedItem.id)}
-                    className="flex items-center gap-2 px-3 md:px-4 py-2 bg-red-500/10 text-red-400 border border-red-500/20 rounded-xl text-[9px] md:text-[10px] font-bold uppercase tracking-widest transition-all hover:bg-red-500 hover:text-white"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                    <span className="hidden sm:inline">Remover</span>
+              <div className="flex gap-2">
+                {selectedItem.lead && (
+                  <button onClick={() => setShowLeadDetails(!showLeadDetails)} className={`px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all flex items-center gap-2 border ${showLeadDetails ? 'bg-accent text-primary border-accent' : 'bg-white/5 text-white/40 border-white/10 hover:border-accent/50'}`}>
+                    <Sparkles className="w-3.5 h-3.5" />
+                    {showLeadDetails ? 'Fechar Orçamento' : 'Ver Orçamento'}
                   </button>
                 )}
               </div>
             </header>
 
-            <div className="flex-1 overflow-y-auto p-3 md:p-8 space-y-6 md:space-y-8 custom-scrollbar">
-              {activeTab === 'leads' || selectedItem?.type === 'lead' ? (
-                <div className="max-w-2xl mx-auto w-full">
-                  <div className="bg-white/5 border border-white/10 rounded-3xl md:rounded-[2.5rem] p-4 md:p-10 space-y-5 md:space-y-8 relative overflow-hidden">
+            <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 custom-scrollbar relative">
+              {showLeadDetails && selectedItem.lead && (
+                <div className="mb-8 animate-in slide-in-from-top-4 duration-300">
+                  <div className="bg-white/5 border border-white/10 rounded-3xl p-6 md:p-8 space-y-6 relative overflow-hidden shadow-2xl">
                     <div className="absolute top-0 right-0 w-32 h-32 bg-accent/10 blur-[50px] -mr-16 -mt-16" />
-                    
-                    <div className="flex items-center gap-3 md:gap-4 text-accent">
-                      <Sparkles className="w-4 h-4 md:w-6 md:h-6" />
-                      <h3 className="text-sm md:text-xl font-bold uppercase tracking-widest">Resumo do Projeto</h3>
+                    <div className="flex items-center gap-3 text-accent"><Sparkles className="w-5 h-5" /><h3 className="text-sm font-bold uppercase tracking-widest">Resumo do Projeto</h3></div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="p-4 bg-white/5 rounded-2xl border border-white/5"><p className="text-[9px] uppercase tracking-widest text-white/30 mb-1">Investimento</p><p className="font-bold text-sm text-accent">{selectedItem.lead.budget || 'Não informado'}</p></div>
+                      <div className="p-4 bg-white/5 rounded-2xl border border-white/5"><p className="text-[9px] uppercase tracking-widest text-white/30 mb-1">Serviços</p><p className="text-[10px] font-bold text-white/80 uppercase">{selectedItem.lead.services?.join(', ')}</p></div>
                     </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                      <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
-                        <p className="text-[9px] md:text-[10px] uppercase tracking-widest text-white/30 mb-2">Cliente</p>
-                        <p className="font-bold text-sm md:text-base truncate">{selectedItem.name}</p>
-                      </div>
-                      <div className="p-4 bg-white/5 rounded-2xl border border-white/5">
-                        <p className="text-[9px] md:text-[10px] uppercase tracking-widest text-white/30 mb-2">Email</p>
-                        <p className="font-mono text-[10px] md:text-sm break-all">{selectedItem.email}</p>
-                      </div>
-                      <div className="p-4 bg-accent/10 rounded-2xl border border-accent/20">
-                        <p className="text-[9px] md:text-[10px] uppercase tracking-widest text-accent/60 mb-2">Investimento</p>
-                        <p className="font-bold text-sm md:text-base text-accent">{selectedItem.budget || 'Não informado'}</p>
-                      </div>
-                    </div>
-
-                    <div>
-                      <p className="text-[10px] uppercase tracking-widest text-white/30 mb-4">Serviços Solicitados</p>
-                      <div className="flex flex-wrap gap-2">
-                        {selectedItem.services?.map(s => (
-                          <span key={s} className="px-3 md:px-4 py-1.5 bg-accent/20 text-accent rounded-full text-[9px] md:text-[10px] font-bold uppercase tracking-widest border border-accent/20">{s}</span>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="p-5 md:p-6 bg-black/20 rounded-2xl border border-white/5">
-                      <p className="text-[10px] uppercase tracking-widest text-white/30 mb-4">A Ideia</p>
-                      <p className="text-xs md:text-sm leading-relaxed text-white/80">{selectedItem.idea}</p>
-                    </div>
-
-                    <div className="pt-6 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
-                      <p className="text-[9px] md:text-[10px] text-white/20 font-mono order-2 md:order-1">RECEBIDO_EM: {new Date(selectedItem.created_at).toLocaleString()}</p>
-                      <button
-                        onClick={async () => {
-                          const { data: profile } = await supabase
-                            .from('profiles')
-                            .select('*')
-                            .eq('email', selectedItem.email)
-                            .single();
-                          
-                          if (profile) {
-                            setActiveTab('chats');
-                            setSelectedItem({ ...profile, type: 'profile' });
-                            fetchClients();
-                          } else {
-                            // Marcar lead como respondido para aparecer na aba conversas
-                            await supabase.from('leads').update({ status: 'responded' }).eq('id', selectedItem.id);
-                            setActiveTab('chats');
-                            setSelectedItem({ ...selectedItem, type: 'lead' });
-                            fetchClients();
-                            fetchLeads();
-                          }
-                        }}
-                        className="w-full md:w-auto px-6 py-3 bg-accent text-primary rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-white transition-all flex items-center justify-center gap-2 order-1 md:order-2"
-                      >
-                        <MessageSquare className="w-4 h-4" />
-                        Responder no Chat
-                      </button>
-                    </div>
+                    <div className="p-5 bg-black/20 rounded-2xl border border-white/5"><p className="text-[9px] uppercase tracking-widest text-white/30 mb-3">A Ideia</p><p className="text-xs leading-relaxed text-white/80 italic">"{selectedItem.lead.idea}"</p></div>
                   </div>
                 </div>
-              ) : (
-                <>
-                  {messages.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-20 opacity-20 space-y-4">
-                      <MessageSquare className="w-12 h-12" />
-                      <p className="text-[10px] uppercase tracking-[0.4em]">Inicie a conversa abaixo</p>
-                    </div>
-                  ) : (
-                    messages.map((msg, i) => {
-                      const isAdmin = msg.sender_id === user.id;
-                      return (
-                        <div key={msg.id || i} className={`flex w-full ${isAdmin ? 'justify-end' : 'justify-start'}`}>
-                          <div className={`max-w-[70%] rounded-2xl p-5 text-sm leading-relaxed shadow-xl ${
-                            isAdmin 
-                              ? 'bg-white/10 text-white rounded-br-sm border border-white/5' 
-                              : 'bg-accent/10 text-accent rounded-bl-sm border border-accent/20'
-                          }`}>
-                            {msg.text}
-                            <div className="flex items-center justify-between gap-4 mt-3">
-                              <span className={`text-[9px] font-mono ${isAdmin ? 'text-white/20' : 'text-accent/40'}`}>
-                                {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                              </span>
-                              {isAdmin && <CheckCircle className="w-3 h-3 text-accent/40" />}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })
-                  )}
-                  <div ref={messagesEndRef} />
-                </>
               )}
+
+              {messages.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-20 opacity-20 space-y-4"><MessageSquare className="w-12 h-12" /><p className="text-[10px] uppercase tracking-[0.4em]">Inicie a conversa abaixo</p></div>
+              ) : (
+                messages.map((msg, i) => (
+                  <div key={msg.id || i} className={`flex w-full ${msg.sender_id === user.id ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`max-w-[70%] rounded-2xl p-4 text-sm shadow-xl ${msg.sender_id === user.id ? 'bg-white/10 text-white rounded-br-sm border border-white/5' : 'bg-accent/10 text-accent rounded-bl-sm border border-accent/20'}`}>
+                      {msg.text}
+                      <div className="flex items-center justify-between gap-4 mt-2"><span className="text-[9px] opacity-30">{new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>{msg.sender_id === user.id && <CheckCircle className="w-3 h-3 opacity-30" />}</div>
+                    </div>
+                  </div>
+                ))
+              )}
+              <div ref={messagesEndRef} />
             </div>
 
-            {activeTab === 'chats' && selectedItem?.type === 'profile' && (
-              <footer className="p-8 border-t border-white/5 bg-primary/50 backdrop-blur-xl">
-                <form onSubmit={handleSend} className="relative max-w-4xl mx-auto">
-                  <input
-                    type="text"
-                    value={newMessage}
-                    onChange={(e) => setNewMessage(e.target.value)}
-                    placeholder={`Responder para ${selectedItem.name?.split(' ')[0] || 'cliente'}...`}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-5 pl-6 pr-16 text-white placeholder:text-white/20 focus:outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/50 transition-all shadow-inner"
-                  />
-                  <button
-                    type="submit"
-                    disabled={!newMessage.trim()}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-12 h-12 rounded-xl bg-accent text-primary flex items-center justify-center hover:scale-105 transition-all disabled:opacity-30 disabled:hover:scale-100 shadow-lg"
-                  >
-                    <Send className="w-5 h-5 ml-0.5" />
-                  </button>
-                </form>
-              </footer>
-            )}
+            <footer className="p-6 border-t border-white/5 bg-primary/50 backdrop-blur-xl">
+              <form onSubmit={handleSend} className="relative max-w-4xl mx-auto flex gap-3">
+                <input type="text" value={newMessage} onChange={e => setNewMessage(e.target.value)} placeholder={`Escrever para ${selectedItem.name}...`} className="flex-1 bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white placeholder:text-white/20 focus:outline-none focus:border-accent/50" />
+                <button type="submit" disabled={!newMessage.trim()} className="w-14 h-14 rounded-2xl bg-accent text-primary flex items-center justify-center hover:scale-105 transition-all disabled:opacity-30 shadow-lg"><Send className="w-5 h-5 ml-1" /></button>
+              </form>
+            </footer>
           </>
+        ) : (
+          <div className="flex-1 flex flex-col items-center justify-center p-12 text-center opacity-20 space-y-6"><div className="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-accent/20 to-transparent flex items-center justify-center border border-accent/20"><MessageSquare className="w-10 h-10 text-accent" /></div><div className="space-y-2"><h2 className="text-xl font-bold uppercase tracking-[0.3em]">Painel de Controle</h2><p className="text-[10px] uppercase tracking-widest">Selecione uma conversa para começar</p></div></div>
         )}
       </main>
-      <ConfirmModal 
-        {...confirmConfig} 
-        onClose={() => setConfirmConfig(prev => ({ ...prev, isOpen: false }))} 
-      />
+
+      <ConfirmModal isOpen={confirmConfig.isOpen} title={confirmConfig.title} message={confirmConfig.message} onConfirm={() => { confirmConfig.onConfirm(); setConfirmConfig({ ...confirmConfig, isOpen: false }); }} onClose={() => setConfirmConfig({ ...confirmConfig, isOpen: false })} />
     </div>
   );
 };
