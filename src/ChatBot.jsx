@@ -27,7 +27,7 @@ const faqs = [
   }
 ];
 
-export const ChatBot = ({ onStart, isOpen: controlledIsOpen, onClose: controlledOnClose }) => {
+export const ChatBot = ({ onStart, isOpen: controlledIsOpen, onClose: controlledOnClose, onOpen: controlledOnOpen }) => {
   const [internalIsOpen, setInternalIsOpen] = useState(false);
   
   const isOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
@@ -38,7 +38,8 @@ export const ChatBot = ({ onStart, isOpen: controlledIsOpen, onClose: controlled
   };
   
   const handleOpen = () => {
-    setInternalIsOpen(true);
+    if (controlledOnOpen) controlledOnOpen();
+    else setInternalIsOpen(true);
   };
 
   const [messages, setMessages] = useState([]);

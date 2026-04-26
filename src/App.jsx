@@ -638,7 +638,12 @@ export default function App() {
       <ContactModal isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} />
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
       <AccountModal isOpen={isAccountOpen} onClose={() => setIsAccountOpen(false)} session={session} />
-      <ChatBot isOpen={isSupportOpen} onClose={() => setIsSupportOpen(false)} onStart={handleChatClick} />
+      <ChatBot 
+        isOpen={isSupportOpen} 
+        onOpen={() => setIsSupportOpen(true)}
+        onClose={() => setIsSupportOpen(false)} 
+        onStart={handleChatClick} 
+      />
     </main>
   );
 }
