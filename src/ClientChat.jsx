@@ -71,11 +71,16 @@ export const ClientChat = () => {
     const text = newMessage;
     setNewMessage('');
 
-    await supabase.from('messages').insert([{
+    const { error } = await supabase.from('messages').insert([{
       text,
       sender_id: user.id,
       receiver_id: null // Message to admin
     }]);
+
+    if (error) {
+      alert("Erro ao enviar: " + error.message);
+      console.error(error);
+    }
   };
 
   const handleLogout = async () => {
