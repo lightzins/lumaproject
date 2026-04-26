@@ -1,200 +1,182 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { X, CheckCircle2, AlertCircle, Loader2, UserPlus } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Mail, User, ArrowRight, Loader2, Sparkles, CheckCircle2 } from 'lucide-react';
+import { supabase } from './supabase';
 import { gsap } from 'gsap';
-import emailjs from '@emailjs/browser';
 
 export const ContactModal = ({ isOpen, onClose }) => {
-  const [step, setStep] = useState('signup'); // 'signup', 'details', 'loading', 'success'
-  const [accountData, setAccountData] = useState({ name: '', email: '' });
-  const [errorMessage, setErrorMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   
-  const formRef = useRef(null);
-  const modalRef = useRef(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    idea: '',
+    budget: '',
+    services: []
+  });
+
+  const modalRef = React.useRef(null);
 
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      gsap.fromTo(modalRef.current, { opacity: 0, scale: 0.95 }, { opacity: 1, scale: 1, duration: 0.5, ease: "expo.out" });
-    } else {
-      document.body.style.overflow = 'auto';
-      setTimeout(() => {
-        setStep('signup');
-        setAccountData({ name: '', email: '' });
-        setErrorMessage('');
-      }, 300);
+    if (isOpen && modalRef.current) {
+      setSuccess(false);
+      setFormData({ name: '', email: '', idea: '', budget: '', services: [] });
+      gsap.fromTo(modalRef.current, 
+        { opacity: 0, scale: 0.95, y: 20 },
+        { opacity: 1, scale: 1, y: 0, duration: 0.5, ease: 'back.out(1.2)' }
+      );
     }
   }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const handleSignup = (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const name = formData.get('name');
-    const email = formData.get('email');
-
-    // Simulate delay
-    setStep('loading');
-    setErrorMessage('');
-    
-    setTimeout(() => {
-      setAccountData({ name, email });
-      setStep('details');
-    }, 1200);
+  const handleClose = () => {
+    gsap.to(modalRef.current, {
+      opacity: 0, scale: 0.95, y: 20, duration: 0.3, ease: 'power2.in',
+      onComplete: onClose
+    });
   };
 
-  const sendEmail = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setStep('loading');
-    setErrorMessage('');
+    setLoading(true);
 
-    const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-    const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-    const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
-
-    if (!serviceId || !templateId || !publicKey) {
-      setStep('details');
-      setErrorMessage('Erro de configuração: Chaves do EmailJS não encontradas.');
-      return;
+    try {
+      const { error } = await supabase.from('leads').insert([formData]);
+      if (error) throw error;
+      setSuccess(true);
+    } catch (err) {
+      alert("Ocorreu um erro ao enviar sua ideia. Tente novamente mais tarde.");
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
-
-    const messageContent = formRef.current.message.value;
-
-    // Configurando os parâmetros para que o e-mail apareça após o nome
-    const templateParams = {
-      name: `${accountData.name} (${accountData.email})`,
-      email: accountData.email,
-      message: messageContent
-    };
-
-    emailjs.send(serviceId, templateId, templateParams, {
-      publicKey: publicKey,
-    })
-    .then(
-      () => {
-        setStep('success');
-      },
-      (error) => {
-        console.error('FAILED...', error);
-        setStep('details');
-        setErrorMessage('Ocorreu um erro ao enviar sua mensagem. Tente novamente.');
-      },
-    );
   };
+
+  const servicesList = ['Web Design', 'Sistemas', 'E-commerce', 'Outro'];
 
   return (
-    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6">
-      <div className="absolute inset-0 bg-primary/40 backdrop-blur-md" onClick={onClose} />
-      
+    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 sm:p-6 bg-background/80 backdrop-blur-xl">
       <div 
         ref={modalRef}
-        className="relative bg-background w-full max-w-lg rounded-[3rem] p-8 md:p-12 shadow-2xl border border-primary/5 overflow-y-auto max-h-[90vh]"
+        className="relative w-full max-w-lg bg-primary/90 backdrop-blur-3xl border border-white/10 rounded-[2rem] p-8 shadow-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
       >
-        <button onClick={onClose} className="absolute top-6 right-6 p-2 hover:bg-primary/5 rounded-full transition-colors z-10">
-          <X className="w-5 h-5" />
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-accent/20 rounded-full blur-[80px] pointer-events-none" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent/10 rounded-full blur-[80px] pointer-events-none" />
+
+        <button 
+          onClick={handleClose}
+          className="absolute top-6 right-6 p-2 rounded-full hover:bg-white/10 transition-colors z-10"
+        >
+          <X className="w-5 h-5 text-white/60 hover:text-white" />
         </button>
 
-        {step === 'signup' && (
-          <div className="pt-2">
-            <div className="w-16 h-16 bg-accent/10 rounded-3xl flex items-center justify-center mb-8">
-              <UserPlus className="text-accent w-8 h-8" />
+        <div className="relative z-10">
+          {success ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="w-16 h-16 rounded-full bg-accent/20 flex items-center justify-center mb-6">
+                <CheckCircle2 className="w-8 h-8 text-accent" />
+              </div>
+              <h2 className="text-2xl font-bold text-white mb-2">Ideia Recebida!</h2>
+              <p className="text-white/60 mb-8 max-w-xs mx-auto">
+                Nossa equipe vai analisar o seu projeto e entraremos em contato em até 24 horas.
+              </p>
+              <button 
+                onClick={handleClose}
+                className="bg-white/10 text-white px-8 py-3 rounded-xl hover:bg-white/20 transition-colors"
+              >
+                Fechar
+              </button>
             </div>
-            <h3 className="text-3xl font-black uppercase tracking-tighter mb-4">Iniciar Projeto</h3>
-            <p className="text-sm opacity-50 mb-8 leading-relaxed">
-              Preencha seus dados para enviar a proposta e dar o primeiro passo no seu projeto.
-            </p>
-
-            <form onSubmit={handleSignup} className="space-y-6">
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-widest opacity-60 mb-2">Nome Completo</label>
-                <input 
-                  type="text" 
-                  name="name" 
-                  required 
-                  className="w-full bg-primary/5 border border-primary/10 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-accent transition-colors"
-                  placeholder="Seu nome"
-                />
-              </div>
-              
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-widest opacity-60 mb-2">E-mail</label>
-                <input 
-                  type="email" 
-                  name="email" 
-                  required 
-                  className="w-full bg-primary/5 border border-primary/10 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-accent transition-colors"
-                  placeholder="seu@email.com"
-                />
+          ) : (
+            <>
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center border border-accent/30">
+                  <Sparkles className="w-5 h-5 text-accent" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-white tracking-tight">Qual é a sua ideia?</h2>
+                  <p className="text-white/50 text-sm mt-1">Preencha os detalhes e retornaremos em até 24h.</p>
+                </div>
               </div>
 
-              <button 
-                type="submit" 
-                className="w-full py-5 rounded-full bg-black text-white font-black text-xs uppercase tracking-widest hover:bg-black/80 transition-all duration-300 flex justify-center items-center"
-              >
-                Continuar
-              </button>
-            </form>
-          </div>
-        )}
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div>
+                  <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2 ml-1">Seu Nome</label>
+                  <div className="relative">
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30" />
+                    <input 
+                      type="text" required value={formData.name}
+                      onChange={e => setFormData({...formData, name: e.target.value})}
+                      placeholder="Como devemos te chamar?"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-white/20 focus:outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/50 transition-all"
+                    />
+                  </div>
+                </div>
 
-        {step === 'details' && (
-          <div className="pt-2">
-            <h3 className="text-2xl font-black uppercase tracking-tighter mb-2">Detalhes do Projeto</h3>
-            <p className="text-sm opacity-50 mb-8">Olá, {accountData.name.split(' ')[0]}! Preencha os detalhes abaixo para enviar sua solicitação.</p>
+                <div>
+                  <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2 ml-1">E-mail</label>
+                  <div className="relative">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30" />
+                    <input 
+                      type="email" required value={formData.email}
+                      onChange={e => setFormData({...formData, email: e.target.value})}
+                      placeholder="seu@email.com"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white placeholder:text-white/20 focus:outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/50 transition-all"
+                    />
+                  </div>
+                </div>
 
-            {errorMessage && (
-              <div className="mb-6 p-4 bg-red-500/10 text-red-500 rounded-2xl flex items-center gap-3 text-sm font-medium">
-                <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                <p className="text-left">{errorMessage}</p>
-              </div>
-            )}
+                <div>
+                  <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2 ml-1">Resumo do Projeto</label>
+                  <textarea 
+                    required value={formData.idea}
+                    onChange={e => setFormData({...formData, idea: e.target.value})}
+                    placeholder="Conte-nos o que você tem em mente..."
+                    rows={3}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-white placeholder:text-white/20 focus:outline-none focus:border-accent/50 focus:ring-1 focus:ring-accent/50 transition-all resize-none"
+                  />
+                </div>
 
-            <form ref={formRef} onSubmit={sendEmail} className="space-y-6">
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-widest opacity-60 mb-2">Sua Visão</label>
-                <textarea 
-                  name="message" 
-                  required 
-                  rows="6"
-                  className="w-full bg-primary/5 border border-primary/10 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-accent transition-colors resize-none leading-relaxed"
-                  placeholder="1: Quanto você quer investir?&#10;2: Qual a ideia principal do projeto?&#10;3: Como você deseja expressar essa ideia para seus clientes?"
-                ></textarea>
-              </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-2 ml-1">Interesse</label>
+                  <div className="flex flex-wrap gap-2">
+                    {servicesList.map(service => (
+                      <button
+                        type="button"
+                        key={service}
+                        onClick={() => {
+                          const svcs = formData.services;
+                          if (svcs.includes(service)) setFormData({...formData, services: svcs.filter(s => s !== service)});
+                          else setFormData({...formData, services: [...svcs, service]});
+                        }}
+                        className={`px-4 py-2 rounded-lg text-xs font-medium transition-colors border ${
+                          formData.services.includes(service) 
+                            ? 'bg-accent/20 border-accent text-accent' 
+                            : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10'
+                        }`}
+                      >
+                        {service}
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-              <button 
-                type="submit" 
-                className="w-full py-5 rounded-full bg-accent text-primary font-black text-xs uppercase tracking-widest hover:scale-[1.02] transition-all duration-300 flex justify-center items-center gap-2"
-              >
-                Enviar Proposta Oficial
-              </button>
-            </form>
-          </div>
-        )}
-
-        {step === 'loading' && (
-          <div className="text-center py-16 flex flex-col items-center justify-center">
-            <Loader2 className="w-12 h-12 animate-spin text-accent mb-6" />
-            <h3 className="text-xl font-black uppercase tracking-tighter animate-pulse">Processando...</h3>
-          </div>
-        )}
-
-        {step === 'success' && (
-           <div className="text-center py-8">
-             <div className="w-16 h-16 bg-green-500/10 rounded-3xl flex items-center justify-center mx-auto mb-8">
-               <CheckCircle2 className="text-green-500 w-8 h-8" />
-             </div>
-             <h3 className="text-3xl font-black uppercase tracking-tighter mb-4">Proposta Enviada!</h3>
-             <p className="text-lg font-medium text-primary leading-relaxed mb-8">
-               Proposta recebida com sucesso. Retornaremos no seu e-mail em até <span className="text-accent underline underline-offset-4 decoration-2">24h</span>.
-             </p>
-             <button 
-               onClick={onClose}
-               className="w-full py-5 rounded-full border border-primary/10 font-black text-xs uppercase tracking-widest hover:bg-primary hover:text-background transition-all duration-500"
-             >
-               Concluído
-             </button>
-           </div>
-        )}
+                <button 
+                  type="submit" disabled={loading}
+                  className="w-full mt-2 flex items-center justify-center gap-2 bg-accent text-primary py-4 rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-white transition-all disabled:opacity-50 group"
+                >
+                  {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (
+                    <>
+                      Enviar Pedido de Orçamento
+                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </>
+                  )}
+                </button>
+              </form>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

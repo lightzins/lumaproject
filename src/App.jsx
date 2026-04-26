@@ -65,8 +65,11 @@ const Navbar = () => {
   );
 };
 
+import { ContactModal } from './ContactModal';
 import { AuthModal } from './AuthModal';
 import { ChatBot } from './ChatBot';
+import { supabase } from './supabase';
+import { useNavigate } from 'react-router-dom';
 
 const Hero = ({ onStart }) => {
   const containerRef = useRef(null);
@@ -504,7 +507,32 @@ const Footer = () => {
 };
 
 export default function App() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [isContactOpen, setIsContactOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleChatClick = async () => {
+    // Check if user is already logged in
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (session) {
+      // User is logged in! Let's check if they are admin or client
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', session.user.id)
+        .single();
+        
+      if (profile?.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/chat');
+      }
+    } else {
+      // Not logged in, open the AuthModal
+      setIsAuthOpen(true);
+    }
+  };
 
   useEffect(() => {
     const lenis = new Lenis({
@@ -543,15 +571,16 @@ export default function App() {
   return (
     <main className="selection:bg-accent selection:text-primary antialiased">
       <Noise />
-      <Navbar onStart={() => setIsModalOpen(true)} />
-      <Hero onStart={() => setIsModalOpen(true)} />
+      <Navbar />
+      <Hero onStart={() => setIsContactOpen(true)} />
       <FeatureCards />
       <Philosophy />
       <Protocol />
-      <Pricing onStart={() => setIsModalOpen(true)} />
+      <Pricing onStart={() => setIsContactOpen(true)} />
       <Footer />
-      <AuthModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
-      <ChatBot onStart={() => setIsModalOpen(true)} />
+      <ContactModal isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} />
+      <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
+      <ChatBot onStart={handleChatClick} />
     </main>
   );
 }

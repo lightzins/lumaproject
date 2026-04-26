@@ -107,12 +107,8 @@ export const AuthModal = ({ isOpen, onClose }) => {
               <Bot className="w-5 h-5 text-accent" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-white tracking-tight">
-                {isLogin ? 'Bem-vindo de volta' : 'Iniciar Projeto'}
-              </h2>
-              <p className="text-white/50 text-sm mt-1">
-                {isLogin ? 'Acesse seu painel de comunicação.' : 'Crie sua conta para conversar com nossa equipe.'}
-              </p>
+              <h2 className="text-2xl font-bold text-white tracking-tight">Área do Cliente</h2>
+              <p className="text-white/50 text-sm mt-1">Acesse sua conta para conversar com nossa equipe.</p>
             </div>
           </div>
 
