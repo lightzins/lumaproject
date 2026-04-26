@@ -53,7 +53,7 @@ const Navbar = ({ session, onOpenAccount, onOpenChat, onOpenSupport }) => {
         "flex fixed top-4 md:top-8 right-4 md:right-auto md:left-1/2 md:-translate-x-1/2 z-[100] transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] items-center px-4 py-2 rounded-full md:border border-white/10 md:shadow-2xl",
         isScrolled 
           ? "bg-primary/90 backdrop-blur-xl w-auto" 
-          : "bg-transparent md:bg-primary/40 md:backdrop-blur-md w-auto"
+          : "bg-primary/40 backdrop-blur-md w-auto"
       )}
     >
       <div className="flex items-center gap-8 md:px-4 text-white">
@@ -95,7 +95,7 @@ const Navbar = ({ session, onOpenAccount, onOpenChat, onOpenSupport }) => {
               onClick={onOpenChat}
               className="flex items-center justify-center gap-2 bg-white/10 md:bg-white/10 text-white w-10 h-10 md:w-auto md:h-auto md:px-4 md:py-1.5 rounded-full text-[10px] uppercase tracking-widest font-bold hover:bg-white/20 transition-colors whitespace-nowrap shadow-lg md:shadow-none backdrop-blur-md"
             >
-              <User className="w-5 h-5 md:hidden" />
+              <MessageSquare className="w-5 h-5 md:hidden" />
               <span className="hidden md:inline">Área do Cliente</span>
             </button>
           )}
